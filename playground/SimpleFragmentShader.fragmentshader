@@ -1,6 +1,7 @@
 #version 330 core
 
 // Input data
+/*
 in vec3 fragColor;
 in vec2 fragUV;
 in vec3 Vertex_cameraSpace;
@@ -8,16 +9,19 @@ in vec3 Normal_cameraSpace;
 in vec3 LightPos_cameraSpace;
 in vec3 LightDir_cameraSpace;
 in vec3 InvViewDir_cameraSpace;
+*/
 
 
 // Ouput data
 out vec4 color;
 
-uniform sampler2D mainTexSampler;
+//uniform sampler2D mainTexSampler;
 
 void main()
 {
+	color = vec4(1,0,0.5,1);
 
+	/*
 	vec3 LightColor = vec3(1,1,1);
 	float LightPower = 60.0; // Watts
 
@@ -53,5 +57,6 @@ void main()
 
 	color.rgb = ambientColor + diffuse + specular;
 	color.a = 0.3;
+	*/
 
 }

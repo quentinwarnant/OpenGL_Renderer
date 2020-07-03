@@ -27,8 +27,6 @@ using namespace glm;
 
 int main( void )
 {
-
-
 	// Initialise GLFW
 	if( !glfwInit() )
 	{
@@ -87,61 +85,62 @@ int main( void )
 		//An array of 3 vectors which represents 3 vertices
 		// Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 		// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-		/*
+		
 		static const GLfloat g_vertex_buffer_data[] = {
-			-1.0f,-1.0f,-1.0f, // triangle 1 : begin
-			-1.0f,-1.0f, 1.0f,
-			-1.0f, 1.0f, 1.0f, // triangle 1 : end
-			1.0f, 1.0f,-1.0f, // triangle 2 : begin
-			-1.0f,-1.0f,-1.0f,
-			-1.0f, 1.0f,-1.0f, // triangle 2 : end
-			1.0f,-1.0f, 1.0f,
-			-1.0f,-1.0f,-1.0f,
-			1.0f,-1.0f,-1.0f,
-			1.0f, 1.0f,-1.0f,
-			1.0f,-1.0f,-1.0f,
-			-1.0f,-1.0f,-1.0f,
-			-1.0f,-1.0f,-1.0f,
-			-1.0f, 1.0f, 1.0f,
-			-1.0f, 1.0f,-1.0f,
-			1.0f,-1.0f, 1.0f,
-			-1.0f,-1.0f, 1.0f,
-			-1.0f,-1.0f,-1.0f,
-			-1.0f, 1.0f, 1.0f,
-			-1.0f,-1.0f, 1.0f,
-			1.0f,-1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f,-1.0f,-1.0f,
-			1.0f, 1.0f,-1.0f,
-			1.0f,-1.0f,-1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f,-1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f,-1.0f,
-			-1.0f, 1.0f,-1.0f,
-			1.0f, 1.0f, 1.0f,
-			-1.0f, 1.0f,-1.0f,
-			-1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			-1.0f, 1.0f, 1.0f,
-			1.0f,-1.0f, 1.0f
+			-1.0f,-1.0f,0.0f, // triangle 1 : begin
+			1.0f,-1.0f, 0.0f,
+			0.0f, 1.0f, 0.0f
+			// , // triangle 1 : end
+			// 1.0f, 1.0f,-1.0f, // triangle 2 : begin
+			// -1.0f,-1.0f,-1.0f,
+			// -1.0f, 1.0f,-1.0f, // triangle 2 : end
+			// 1.0f,-1.0f, 1.0f,
+			// -1.0f,-1.0f,-1.0f,
+			// 1.0f,-1.0f,-1.0f,
+			// 1.0f, 1.0f,-1.0f,
+			// 1.0f,-1.0f,-1.0f,
+			// -1.0f,-1.0f,-1.0f,
+			// -1.0f,-1.0f,-1.0f,
+			// -1.0f, 1.0f, 1.0f,
+			// -1.0f, 1.0f,-1.0f,
+			// 1.0f,-1.0f, 1.0f,
+			// -1.0f,-1.0f, 1.0f,
+			// -1.0f,-1.0f,-1.0f,
+			// -1.0f, 1.0f, 1.0f,
+			// -1.0f,-1.0f, 1.0f,
+			// 1.0f,-1.0f, 1.0f,
+			// 1.0f, 1.0f, 1.0f,
+			// 1.0f,-1.0f,-1.0f,
+			// 1.0f, 1.0f,-1.0f,
+			// 1.0f,-1.0f,-1.0f,
+			// 1.0f, 1.0f, 1.0f,
+			// 1.0f,-1.0f, 1.0f,
+			// 1.0f, 1.0f, 1.0f,
+			// 1.0f, 1.0f,-1.0f,
+			// -1.0f, 1.0f,-1.0f,
+			// 1.0f, 1.0f, 1.0f,
+			// -1.0f, 1.0f,-1.0f,
+			// -1.0f, 1.0f, 1.0f,
+			// 1.0f, 1.0f, 1.0f,
+			// -1.0f, 1.0f, 1.0f,
+			// 1.0f,-1.0f, 1.0f
 		};
-		*/
+		
 
 
-		// Read our .obj file
-		std::vector< glm::vec3 > inVertices;
-		std::vector< glm::vec2 > inUvs;
-		std::vector< glm::vec3 > inNormals; // Won't be used at the moment.
-		bool res = LoadOBJ("suzanne.obj", inVertices, inUvs, inNormals);
+		// // Read our .obj file
+		// std::vector< glm::vec3 > inVertices;
+		// std::vector< glm::vec2 > inUvs;
+		// std::vector< glm::vec3 > inNormals; // Won't be used at the moment.
+		// bool res = LoadOBJ("suzanne.obj", inVertices, inUvs, inNormals);
 
-		std::vector< glm::vec3 > vertices;
-		std::vector< glm::vec2 > uvs;
-		std::vector< glm::vec3 > normals; // Won't be used at the moment.
-		std::vector<unsigned short> indices;
+		// std::vector< glm::vec3 > vertices;
+		// std::vector< glm::vec2 > uvs;
+		// std::vector< glm::vec3 > normals; // Won't be used at the moment.
+		// std::vector<unsigned short> indices;
 
-		//Fill indices vector
-		indexVBO_slow( inVertices, inUvs, inNormals, indices, vertices, uvs, normals);
+		// //Fill indices vector
+		// indexVBO_slow( inVertices, inUvs, inNormals, indices, vertices, uvs, normals);
 
 
 		// One color for each vertex. They were generated randomly.
@@ -190,8 +189,8 @@ int main( void )
 		//Bind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		// Give vertices to OpenGL
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data,GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data,GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, inVertices.size() * sizeof(glm::vec3), &inVertices[0], GL_STATIC_DRAW);
 
 		glVertexAttribPointer(
 			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
@@ -203,34 +202,35 @@ int main( void )
 		);
 		glEnableVertexAttribArray(0);
 
+
 		//Unbind vertex VBO
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
-		//INDICES 
-		//Generate buffer for indices
-		GLuint indicesBuffer;
-		glGenBuffers(1, &indicesBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		// //INDICES 
+		// //Generate buffer for indices
+		// GLuint indicesBuffer;
+		// glGenBuffers(1, &indicesBuffer);
+		// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer);
+		// glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+		// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
-		//VERT COLOR
-		GLuint colorBuffer;
-		glGenBuffers(1,&colorBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-		glVertexAttribPointer(
-			1,                  // attribute 1. must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		// //VERT COLOR
+		// GLuint colorBuffer;
+		// glGenBuffers(1,&colorBuffer);
+		// glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+		// glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+		// glVertexAttribPointer(
+		// 	1,                  // attribute 1. must match the layout in the shader.
+		// 	3,                  // size
+		// 	GL_FLOAT,           // type
+		// 	GL_FALSE,           // normalized?
+		// 	0,                  // stride
+		// 	(void*)0            // array buffer offset
+		// );
+		// glEnableVertexAttribArray(1);
+		// glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
 		// UV data
@@ -276,38 +276,38 @@ int main( void )
 		};
 		*/
 
-		//UV
-		GLuint uvBuffer;
-		glGenBuffers(1, &uvBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
-		glVertexAttribPointer(
-			2,				// Attribute 2, same as shader
-			2,				// size of each entry (uv is vec2)
-			GL_FLOAT,		// type
-			GL_FALSE,		//normalised?
-			0,				//stride
-			(void*)0		// array buffer offset
-		);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		// //UV
+		// GLuint uvBuffer;
+		// glGenBuffers(1, &uvBuffer);
+		// glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+		// //glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+		// glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+		// glVertexAttribPointer(
+		// 	2,				// Attribute 2, same as shader
+		// 	2,				// size of each entry (uv is vec2)
+		// 	GL_FLOAT,		// type
+		// 	GL_FALSE,		//normalised?
+		// 	0,				//stride
+		// 	(void*)0		// array buffer offset
+		// );
+		// glEnableVertexAttribArray(2);
+		// glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-		//Normal
-		GLuint normalBuffer;
-		glGenBuffers(1, &normalBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-		glVertexAttribPointer(
-			3,				// Attribute 3, same as shader
-			3,				// size of each entry (normal is vec3)
-			GL_FLOAT,		// type
-			GL_FALSE,		//normalised?
-			0,				//stride
-			(void*)0		// array buffer offset
-		);
-		glEnableVertexAttribArray(3);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		// //Normal
+		// GLuint normalBuffer;
+		// glGenBuffers(1, &normalBuffer);
+		// glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+		// glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+		// glVertexAttribPointer(
+		// 	3,				// Attribute 3, same as shader
+		// 	3,				// size of each entry (normal is vec3)
+		// 	GL_FLOAT,		// type
+		// 	GL_FALSE,		//normalised?
+		// 	0,				//stride
+		// 	(void*)0		// array buffer offset
+		// );
+		// glEnableVertexAttribArray(3);
+		// glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 	glBindVertexArray(0);
 
@@ -347,7 +347,7 @@ int main( void )
 
 
 	//Texture
-	GLuint Texture = loadDDS("uvtemplate.DDS");
+	//GLuint Texture = loadDDS("uvtemplate.DDS");
 
 
 	// Enable depth test
@@ -359,7 +359,7 @@ int main( void )
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Cull triangles which normal is not towards the camera
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	//glDisable(GL_CULL_FACE);
 
 	double lastTime = 0;
@@ -387,26 +387,26 @@ int main( void )
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs(window, deltaTime);
-		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		glm::mat4 ViewMatrix = getViewMatrix();
-		glm::mat4 ModelMatrix = glm::mat4(1.0);
-		glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		// computeMatricesFromInputs(window, deltaTime);
+		// glm::mat4 ProjectionMatrix = getProjectionMatrix();
+		// glm::mat4 ViewMatrix = getViewMatrix();
+		// glm::mat4 ModelMatrix = glm::mat4(1.0);
+		// glm::mat4 mvp = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
-		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-		glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
-		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &mvp[0][0]);
+		// glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+		// glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
+		// glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &mvp[0][0]);
 
 		
-		glm::vec3 lightPos = glm::vec3(4,4,4);
-		glUniform3f(LightPosID, lightPos.x, lightPos.y, lightPos.z);
+		// glm::vec3 lightPos = glm::vec3(4,4,4);
+		// glUniform3f(LightPosID, lightPos.x, lightPos.y, lightPos.z);
 
 		glUseProgram(programID);
 			glBindVertexArray(VertexArrayID);
 
 				// Draw the triangle !
-				//glDrawArrays(GL_TRIANGLES, 0, vertices.size() * 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-				glDrawElements(GL_TRIANGLES, indices.size() , GL_UNSIGNED_SHORT, 0); // 0 = offset
+				glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+				//glDrawElements(GL_TRIANGLES, indices.size() , GL_UNSIGNED_SHORT, 0); // 0 = offset
 
 			glBindVertexArray(0);
 		glUseProgram(0);
@@ -426,12 +426,12 @@ int main( void )
 
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexBuffer);
-	glDeleteBuffers(1, &uvBuffer);
-	glDeleteBuffers(1, &colorBuffer);
-	glDeleteBuffers(1, &normalBuffer);
-	glDeleteBuffers(1, &indicesBuffer);
+	// glDeleteBuffers(1, &uvBuffer);
+	// glDeleteBuffers(1, &colorBuffer);
+	// glDeleteBuffers(1, &normalBuffer);
+	// glDeleteBuffers(1, &indicesBuffer);
 	glDeleteProgram(programID);
-	glDeleteTextures(1, &Texture);
+	// glDeleteTextures(1, &Texture);
 
 	// Unbind & destroy
 	glDeleteVertexArrays(1, &VertexArrayID);
