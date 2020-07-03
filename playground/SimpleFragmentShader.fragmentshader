@@ -1,0 +1,57 @@
+#version 330 core
+
+// Input data
+in vec3 fragColor;
+in vec2 fragUV;
+in vec3 Vertex_cameraSpace;
+in vec3 Normal_cameraSpace;
+in vec3 LightPos_cameraSpace;
+in vec3 LightDir_cameraSpace;
+in vec3 InvViewDir_cameraSpace;
+
+
+// Ouput data
+out vec4 color;
+
+uniform sampler2D mainTexSampler;
+
+void main()
+{
+
+	vec3 LightColor = vec3(1,1,1);
+	float LightPower = 60.0; // Watts
+
+	vec3 albedo = vec3(1,1,1);// texture(mainTexSampler, fragUV).rgb;
+
+	vec3 ambientColor = vec3(0.1,0.1,0.1) * albedo;
+	vec3 materialSpecularColor = vec3(0.3, 0.3, 0.3);
+
+	//color = fragColor;
+
+	vec3 n = normalize(Normal_cameraSpace);
+	vec3 l = normalize(LightDir_cameraSpace);
+
+
+	float NdotL = dot(n,l);
+	NdotL = clamp(NdotL, 0, 1); // saturate?
+
+	float distance = length(Vertex_cameraSpace - LightPos_cameraSpace);
+	float distanceSqr = (distance * distance);
+
+	vec3 diffuse = (albedo *  LightColor * LightPower * NdotL / distanceSqr);
+
+	vec3 inverseViewDir_cameraSpace = normalize(InvViewDir_cameraSpace);
+	vec3 reflectDir = reflect(-l,n);
+	// Cosine of the angle between the Eye vector and the Reflect vector,
+	// clamped to 0
+	//  - Looking into the reflection -> 1
+	//  - Looking elsewhere -> < 1
+	float cosReflect = clamp( dot(inverseViewDir_cameraSpace, reflectDir), 0, 1);
+
+
+	vec3 specular = materialSpecularColor * LightColor * LightPower * pow(cosReflect, 5)  / distanceSqr; 
+
+	color.rgb = ambientColor + diffuse + specular;
+	color.a = 0.3;
+
+}
