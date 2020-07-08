@@ -19,16 +19,14 @@ GLFWwindow* window;
 using namespace glm;
 
 //Load Shaders helper
-#include <common/shader.hpp>
+//#include <common/shader.hpp>
 #include <common/vboindexer.hpp>
 
 #include <playground/ImageLoader.hpp>
 #include <playground/ControlSystem.hpp>
 #include <playground/OBJLoader.hpp>
 #include <playground/Mesh.hpp>
-
-GLuint uniformModel;
-GLuint uniformProjection;
+#include <playground/Shader.hpp>
 
 const float degToRad = 3.14159265f / 180.0f;
 
@@ -122,14 +120,11 @@ int main( void )
 
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader" );
-
-	uniformModel = glGetUniformLocation(programID, "Model");
-	uniformProjection = glGetUniformLocation(programID, "Projection");
-
+	//GLuint programID = LoadShaders( "SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader" );
+	Shader* shader = new Shader();
+	shader->LoadShader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"); 
 
 	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.02f, 1000.0f );
- 
 
 	// // create MVP matrix
 	// // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
@@ -223,15 +218,14 @@ int main( void )
 
 		float rotation = rotationDegrees * degToRad;
 
-		glUseProgram(programID);
-
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix) );
+		shader->StartUseShader();
+		glUniformMatrix4fv(shader->GetUniformProjectionID(), 1, GL_FALSE, glm::value_ptr(projectionMatrix) );
 
 		glm::mat4 modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
 		modelMatrix = glm::rotate(modelMatrix, rotation, glm::vec3(0,1,0) );
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+		glUniformMatrix4fv(shader->GetUniformModelID(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
 		m_meshes[0]->RenderMesh();
 
@@ -240,11 +234,11 @@ int main( void )
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
 		modelMatrix = glm::rotate(modelMatrix, -rotation, glm::vec3(0,1,0) );
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+		glUniformMatrix4fv(shader->GetUniformModelID(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 		
 		m_meshes[1]->RenderMesh();
 
-		glUseProgram(0);
+		shader->EndUseShader();
 		
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -254,7 +248,8 @@ int main( void )
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0 );
 
 	// Cleanup shader
-	glDeleteProgram(programID);
+	delete(shader);
+	//glDeleteProgram(programID);
 	// glDeleteTextures(1, &Texture);
 
 	// Unbind & destroy

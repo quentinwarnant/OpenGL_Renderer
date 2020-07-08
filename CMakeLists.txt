@@ -80,6 +80,9 @@ add_executable(playground
 	playground/Mesh.cpp
 	playground/Mesh.hpp
 
+	playground/Shader.cpp
+	playground/Shader.hpp
+
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader
 )
