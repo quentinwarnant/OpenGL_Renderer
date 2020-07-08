@@ -77,6 +77,8 @@ add_executable(playground
 	playground/OBJLoader.hpp
 	playground/OBJLoader.cpp
 
+	playground/Mesh.cpp
+	playground/Mesh.hpp
 
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader

@@ -11,48 +11,19 @@ layout(location = 3) in vec3 vertexNormal_modelSpace;
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
 uniform mat4 View;
-uniform mat4 Model;
 
-uniform float posOffset;
+uniform mat4 Model;
+uniform mat4 Projection;
 
 uniform vec3 lightPosition_worldSpace;
 
-/*
-out vec3 fragColor;
-out vec2 fragUV;
+out vec4 vCol;
 
-out vec3 Vertex_cameraSpace;
-out vec3 Normal_cameraSpace;
-out vec3 LightPos_cameraSpace;
-out vec3 LightDir_cameraSpace;
-out vec3 InvViewDir_cameraSpace;
-*/
 
 void main()
 {
-    gl_Position = vec4((vertexPosition_modelspace * 0.5) + vec3(posOffset,0,0)  ,1);
+    gl_Position = Projection * Model * vec4(vertexPosition_modelspace ,1);
+    vCol = vec4( clamp(vertexPosition_modelspace, 0, 1),1);
 
-
-/*
-    gl_Position = MVP * vec4(vertexPosition_modelspace,1);
-    fragColor = vertexColor;
-    //fragColor = vertexNormal;
-
-    // Vector that goes from the vertex to the camera, in camera space.
-    // In camera space, the camera is at the origin (0,0,0).
-    Vertex_cameraSpace = (Model * View * vec4(vertexPosition_modelspace,1)).xyz;
-    InvViewDir_cameraSpace = vec3(0,0,0) - Vertex_cameraSpace;
-
-    // Vector that goes from the vertex to the light, in camera space. M is ommited because it's identity.
-    LightPos_cameraSpace = (View * vec4(lightPosition_worldSpace,1)).xyz;
-    LightDir_cameraSpace = LightPos_cameraSpace + InvViewDir_cameraSpace;
-
-        
-    // Normal of the the vertex, in camera space
-    // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
-    Normal_cameraSpace = (View * Model * vec4( vertexNormal_modelSpace, 0 ) ).xyz; 
-
-    fragUV = vertexUV;
-*/
 }
 
