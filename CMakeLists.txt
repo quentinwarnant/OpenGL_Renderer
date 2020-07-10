@@ -61,9 +61,14 @@ add_definitions(
 
 # User playground
 add_executable(playground 
+
+	playground/QWindow.cpp
+	playground/QWindow.hpp
+	
 	playground/playground.cpp
-	common/shader.cpp
-	common/shader.hpp
+	
+	#common/shader.cpp
+	#common/shader.hpp
 
 	common/vboindexer.cpp
 	common/vboindexer.hpp
@@ -82,6 +87,7 @@ add_executable(playground
 
 	playground/Shader.cpp
 	playground/Shader.hpp
+
 
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader
