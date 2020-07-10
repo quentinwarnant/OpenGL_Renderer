@@ -31,8 +31,6 @@ using namespace glm;
 
 const float degToRad = 3.14159265f / 180.0f;
 
-std::vector<Mesh*> m_meshes;
-
 // Returns VAO's id
 Mesh* CreateTriangle()
 {
@@ -72,6 +70,7 @@ int main( void )
 	
 
 	//Create two shapes
+	std::vector<Mesh*> m_meshes;
 	Mesh* triangle = CreateTriangle();
 	m_meshes.push_back(triangle);
 	
@@ -79,7 +78,6 @@ int main( void )
 	m_meshes.push_back(triangle2);
 
 	// Create and compile our GLSL program from the shaders
-	//GLuint programID = LoadShaders( "SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader" );
 	Shader* shader = new Shader();
 	shader->LoadShader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"); 
 

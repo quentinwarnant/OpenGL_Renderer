@@ -15,7 +15,7 @@ public:
     GLuint GetWindowBufferWidth() { return m_windowBufferWidth;}
     GLuint GetWindowBufferHeight() { return m_windowBufferHeight;}
 
-    bool ShouldClose() { return glfwGetKey(m_mainWindow, GLFW_KEY_ESCAPE ) == GLFW_PRESS || glfwWindowShouldClose(m_mainWindow); }
+    bool ShouldClose() { return glfwWindowShouldClose(m_mainWindow); }
     void SwapBuffers() { glfwSwapBuffers(m_mainWindow);}
 
 private:
@@ -25,4 +25,13 @@ private:
     int m_windowBufferWidth, m_windowBufferHeight;
 
     const char* m_title;
+
+    //keyboard input
+    bool m_keys[1024];
+
+    void InitCallbacks();
+
+
+    // input
+    static void HandleInput(GLFWwindow* window, int key, int code, int action, int mode);
 };
