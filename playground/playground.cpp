@@ -57,7 +57,9 @@ Mesh* CreateTriangle()
 	};
 	
 	Mesh* triangleMesh = new Mesh();
-	triangleMesh->CreateMesh(g_vertex_buffer_data, sizeof(g_vertex_buffer_data), indices, sizeof(indices));
+	unsigned int vertCount = sizeof(g_vertex_buffer_data) / sizeof(g_vertex_buffer_data[0]);
+	unsigned int indicesCount = sizeof(indices) / sizeof(indices[0]);
+	triangleMesh->CreateMesh(g_vertex_buffer_data, vertCount, indices, indicesCount);
 
 	return triangleMesh;
 }
