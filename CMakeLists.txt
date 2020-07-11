@@ -70,14 +70,17 @@ add_executable(playground
 	#common/shader.cpp
 	#common/shader.hpp
 
-	common/vboindexer.cpp
-	common/vboindexer.hpp
+	#common/vboindexer.cpp
+	#common/vboindexer.hpp
 
-	playground/ImageLoader.cpp
-	playground/ImageLoader.hpp
+	#playground/ImageLoader.cpp
+	#playground/ImageLoader.hpp
 
-	playground/ControlSystem.hpp
-	playground/ControlSystem.cpp
+	#playground/ControlSystem.hpp
+	#playground/ControlSystem.cpp
+
+	playground/Camera.cpp
+	playground/Camera.hpp
 
 	playground/OBJLoader.hpp
 	playground/OBJLoader.cpp

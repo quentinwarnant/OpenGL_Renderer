@@ -15,7 +15,7 @@ QWindow::QWindow(GLuint windowWidth, GLuint windowHeight, const char* title)
 	}
 
 	m_mousePosChangeX = m_mousePosChangeY = 0;
-	m_mouseHasMovedThisFrame = false;
+	m_mouseHasMoved = false;
 	
 }
 
@@ -92,12 +92,15 @@ void QWindow::InitCallbacks()
 
 void QWindow::PreUpdate()
 {
-	m_mouseHasMovedThisFrame = false;
 }
 
 void QWindow::Update()
 {
 
+}
+
+void QWindow::PostUpdate()
+{
 }
 
 void QWindow::HandleKeyboardInput(GLFWwindow* window, int key, int code, int action, int mode)
@@ -145,9 +148,9 @@ void QWindow::HandleMouseInput(GLFWwindow* window, double mousePosX, double mous
 	thisQWindow->m_mouseLastPosX = mousePosX;
 	thisQWindow->m_mouseLastPosY = mousePosY;
 
-	printf("Mouse Diff x:%.6f y:%.6f \n", thisQWindow->m_mousePosChangeX, thisQWindow->m_mousePosChangeY);
+	//printf("Mouse Diff x:%.6f y:%.6f \n", thisQWindow->m_mousePosChangeX, thisQWindow->m_mousePosChangeY);
 
-	thisQWindow->m_mouseHasMovedThisFrame = true;
+	thisQWindow->m_mouseHasMoved = true;
 }
 
 bool QWindow::IsKeyPressed(int keyId)
@@ -155,17 +158,21 @@ bool QWindow::IsKeyPressed(int keyId)
 	return m_keys[keyId];
 }
 
-void QWindow::GetMouseChange(GLfloat* mousePosChangeX, GLfloat* mousePosChangeY)
+void QWindow::GetMouseChange(GLfloat& mousePosChangeX, GLfloat& mousePosChangeY, bool consume)
 {
-	if(m_mouseHasMovedThisFrame)
+	if(m_mouseHasMoved)
 	{
-		mousePosChangeX = &m_mousePosChangeX;
-		mousePosChangeY = &m_mousePosChangeY;
+		mousePosChangeX = *(&m_mousePosChangeX);
+		mousePosChangeY = *(&m_mousePosChangeY);
 	}
 	else
 	{
 		mousePosChangeX = 0;
 		mousePosChangeY = 0;
 	}
-	
+
+	if( consume )
+	{
+		m_mouseHasMoved = false;
+	}
 }

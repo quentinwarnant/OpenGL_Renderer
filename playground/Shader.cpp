@@ -70,6 +70,8 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		std::vector<char> vertexShaderErrorMessage(infoLogLength+1);
 		glGetShaderInfoLog(vertexShaderID, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
 		printf("%s\n", &vertexShaderErrorMessage[0]);
+		
+		throw new ShaderException("Compilation of vertex shader failed");
 	}
 
 
@@ -85,6 +87,8 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		std::vector<char> fragmentShaderErrorMessage(infoLogLength+1);
 		glGetShaderInfoLog(fragmentShaderID, infoLogLength, NULL, &fragmentShaderErrorMessage[0]);
 		printf("%s\n", &fragmentShaderErrorMessage[0]);
+		
+		throw new ShaderException("Compilation of fragment shader failed");
 	}
 
 	// Link the program
@@ -101,16 +105,22 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		std::vector<char> programErrorMessage(infoLogLength+1);
 		glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
 		printf("%s\n", &programErrorMessage[0]);
+
+		throw new ShaderException("Linking of shader program failed");
 	}
 
-	glValidateProgram(programID);
-	glGetProgramiv(programID, GL_VALIDATE_STATUS, &result);
-	if ( !result ){
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
-		std::vector<char> programErrorMessage(infoLogLength+1);
-		glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
-		printf("%s\n", &programErrorMessage[0]);
-	}
+
+	// Error "no VAO bound" - should this only get checked when using it?
+	// glValidateProgram(programID);
+	// glGetProgramiv(programID, GL_VALIDATE_STATUS, &result);
+	// if ( !result ){
+	// 	glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+	// 	std::vector<char> programErrorMessage(infoLogLength+1);
+	// 	glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
+	// 	printf("%s\n", &programErrorMessage[0]);
+
+	// 	throw new ShaderException("Validation of shader program failed");
+	// }
 
 	
 	glDetachShader(programID, vertexShaderID);
@@ -124,6 +134,7 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 
     //Find uniforms
     m_uniformModelID = glGetUniformLocation(programID, "Model");
+	m_uniformViewID = glGetUniformLocation(programID, "View");
 	m_uniformProjectionID = glGetUniformLocation(programID, "Projection");
 }
 
@@ -145,6 +156,11 @@ void Shader::EndUseShader()
 GLuint Shader::GetUniformModelID()
 {
     return m_uniformModelID;
+}
+
+GLuint Shader::GetUniformViewID()
+{
+	return m_uniformViewID;
 }
     
 GLuint Shader::GetUniformProjectionID()

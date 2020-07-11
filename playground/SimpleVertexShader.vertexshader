@@ -10,9 +10,9 @@ layout(location = 3) in vec3 vertexNormal_modelSpace;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
-uniform mat4 View;
 
 uniform mat4 Model;
+uniform mat4 View;
 uniform mat4 Projection;
 
 uniform vec3 lightPosition_worldSpace;
@@ -22,7 +22,7 @@ out vec4 vCol;
 
 void main()
 {
-    gl_Position = Projection * Model * vec4(vertexPosition_modelspace ,1);
+    gl_Position = Projection * View * Model * vec4(vertexPosition_modelspace ,1);
     vCol = vec4( clamp(vertexPosition_modelspace, 0, 1),1);
 
 }

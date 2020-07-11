@@ -14,6 +14,7 @@ public:
 
     void PreUpdate();
     void Update();
+    void PostUpdate();
 
 
     GLuint GetWindowBufferWidth() { return m_windowBufferWidth;}
@@ -23,7 +24,7 @@ public:
     void SwapBuffers() { glfwSwapBuffers(m_mainWindow);}
 
     bool IsKeyPressed(int keyId);
-    void GetMouseChange(GLfloat* mousePosChangeX, GLfloat* mousePosChangeY);
+    void GetMouseChange(GLfloat& mousePosChangeX, GLfloat& mousePosChangeY, bool consume);
 
 private:
     GLFWwindow* m_mainWindow;
@@ -40,7 +41,7 @@ private:
     GLfloat m_mousePosChangeX, m_mousePosChangeY;
     bool m_mouseHasDoneInitialPositioning;
 
-    bool m_mouseHasMovedThisFrame;
+    bool m_mouseHasMoved;
 
     void InitCallbacks();
 

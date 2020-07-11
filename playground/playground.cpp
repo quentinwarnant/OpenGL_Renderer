@@ -28,6 +28,7 @@ using namespace glm;
 #include <playground/Mesh.hpp>
 #include <playground/Shader.hpp>
 #include <playground/QWindow.hpp>
+#include <playground/Camera.hpp>
 
 const float degToRad = 3.14159265f / 180.0f;
 
@@ -65,12 +66,12 @@ Mesh* CreateTriangle()
 
 int main( void )
 {
-	QWindow* window = new QWindow(1024, 768, "Playground QW");	
+	QWindow* window = new QWindow(768, 480, "Playground QW");	
 	window->Init();
 
 	GLfloat mousePosChangeX, mousePosChangeY;
 
-	
+	Camera* camera = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), -90.0f, 0.0f, 1.0f, 3.0f);
 
 	//Create two shapes
 	std::vector<Mesh*> m_meshes;
@@ -86,6 +87,9 @@ int main( void )
 
 	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.02f, 1000.0f );
 
+	glm::mat4 viewMatrix = mat4(1);
+	glm::mat4 modelMatrix = mat4(1);
+
 	double lastTime = 0;
 
 	//Performance monitoring
@@ -93,6 +97,10 @@ int main( void )
 	double frameTimer = 0;
 
 	float rotationDegrees = 0;
+
+	glm::vec2 moveInput = glm::vec2(0);
+	glm::vec2 turnAxesInput = glm::vec2(0);
+	
 
 	do{
 		double currentTime = glfwGetTime();
@@ -103,7 +111,7 @@ int main( void )
 		frameCount++;
 		if( currentTime - frameTimer > 1.0) // print once a second
 		{
-			fprintf(stdout, "%f ms/frame≤\n", 1000/double(frameCount));
+			//fprintf(stdout, "%f ms/frame≤\n", 1000/double(frameCount));
 
 			frameCount = 0;
 			frameTimer += 1.0;
@@ -113,7 +121,18 @@ int main( void )
 		window->PreUpdate();
 		window->Update();
 
-		window->GetMouseChange(&mousePosChangeX, &mousePosChangeY);
+		window->GetMouseChange(mousePosChangeX, mousePosChangeY, true);
+		printf("Mouse Diff x:%.6f y:%.6f \n", mousePosChangeX, mousePosChangeY);
+
+
+		moveInput.x = window->IsKeyPressed(GLFW_KEY_W) ? 1 : (window->IsKeyPressed(GLFW_KEY_S) ? -1 : 0); 
+		moveInput.y = window->IsKeyPressed(GLFW_KEY_D) ? 1 : (window->IsKeyPressed(GLFW_KEY_A) ? -1 : 0); 
+		turnAxesInput.x = mousePosChangeX;
+		turnAxesInput.y = mousePosChangeY;
+
+
+		camera->Update(deltaTime, moveInput, turnAxesInput);
+
 
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -141,11 +160,18 @@ int main( void )
 		shader->StartUseShader();
 		glUniformMatrix4fv(shader->GetUniformProjectionID(), 1, GL_FALSE, glm::value_ptr(projectionMatrix) );
 
-		glm::mat4 modelMatrix = glm::mat4(1);
+		//Model
+		modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
 		modelMatrix = glm::rotate(modelMatrix, rotation, glm::vec3(0,1,0) );
 		glUniformMatrix4fv(shader->GetUniformModelID(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+
+
+		//View
+		viewMatrix = camera->CalculateViewMatrix();
+		glUniformMatrix4fv(shader->GetUniformViewID(), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
 
 		m_meshes[0]->RenderMesh();
 
@@ -163,6 +189,8 @@ int main( void )
 		window->SwapBuffers();
 		glfwPollEvents();
 
+		window->PostUpdate();
+
 	} // Check if the ESC key was pressed or the window was closed
 	while( window->ShouldClose() == false );
 
@@ -174,6 +202,8 @@ int main( void )
 	{
 		delete(m_meshes[i]);
 	}
+
+	delete(camera);
 
 	//cleanup window & context
 	delete(window);
