@@ -67,6 +67,9 @@ int main( void )
 {
 	QWindow* window = new QWindow(1024, 768, "Playground QW");	
 	window->Init();
+
+	GLfloat mousePosChangeX, mousePosChangeY;
+
 	
 
 	//Create two shapes
@@ -105,6 +108,12 @@ int main( void )
 			frameCount = 0;
 			frameTimer += 1.0;
 		}
+
+		//Get mouse pos change
+		window->PreUpdate();
+		window->Update();
+
+		window->GetMouseChange(&mousePosChangeX, &mousePosChangeY);
 
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

@@ -12,11 +12,18 @@ public:
 
     int Init();
 
+    void PreUpdate();
+    void Update();
+
+
     GLuint GetWindowBufferWidth() { return m_windowBufferWidth;}
     GLuint GetWindowBufferHeight() { return m_windowBufferHeight;}
 
     bool ShouldClose() { return glfwWindowShouldClose(m_mainWindow); }
     void SwapBuffers() { glfwSwapBuffers(m_mainWindow);}
+
+    bool IsKeyPressed(int keyId);
+    void GetMouseChange(GLfloat* mousePosChangeX, GLfloat* mousePosChangeY);
 
 private:
     GLFWwindow* m_mainWindow;
@@ -28,10 +35,17 @@ private:
 
     //keyboard input
     bool m_keys[1024];
+    //Mouse input
+    GLfloat m_mouseLastPosX, m_mouseLastPosY;
+    GLfloat m_mousePosChangeX, m_mousePosChangeY;
+    bool m_mouseHasDoneInitialPositioning;
+
+    bool m_mouseHasMovedThisFrame;
 
     void InitCallbacks();
 
 
     // input
-    static void HandleInput(GLFWwindow* window, int key, int code, int action, int mode);
+    static void HandleKeyboardInput(GLFWwindow* window, int key, int code, int action, int mode);
+    static void HandleMouseInput(GLFWwindow* window, double mousePosX, double mousePosY);
 };
