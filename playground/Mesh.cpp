@@ -26,15 +26,28 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int vertCount, unsigned int* i
 		// Give vertices to OpenGL
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertCount, vertices, GL_STATIC_DRAW);
 
+        //Position
 		glVertexAttribPointer(
 			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 			3,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			0,                  // stride
+			sizeof(vertices[0]) * 5,// stride , format is 3 vertices & 2 uv value
 			(void*)0            // array buffer offset
 		);
-		glEnableVertexAttribArray(0);
+        // Enabling these vertex attributes; is fine from the create mesh until we have multiple sub-meshes to render, in which case we may have different attributes 
+		glEnableVertexAttribArray(0); 
+
+        //UV
+        glVertexAttribPointer(
+			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			2,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			sizeof(vertices[0]) * 5,// stride , format is 3 vertices & 2 uv value
+			(void*)(sizeof(vertices[0]) * 3)// array buffer offset
+		);
+		glEnableVertexAttribArray(1);
 
 
 		//Unbind vertex VBO
@@ -46,6 +59,11 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int vertCount, unsigned int* i
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indicesCount, indices, GL_STATIC_DRAW); 
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0); // TUTORIAL SAYS TO UNBIND AFTER VAO - but... doesn't make sense? s 
+
+        //Now UV attribute
+
+
+
 
 	glBindVertexArray(0);
 }

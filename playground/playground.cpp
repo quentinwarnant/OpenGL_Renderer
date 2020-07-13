@@ -18,13 +18,17 @@ GLFWwindow* window;
 
 using namespace glm;
 
+
 //Load Shaders helper
 //#include <common/shader.hpp>
-#include <common/vboindexer.hpp>
+//#include <common/vboindexer.hpp>
 
-#include <playground/ImageLoader.hpp>
-#include <playground/ControlSystem.hpp>
-#include <playground/OBJLoader.hpp>
+//Image loading library STB_IMAGE - SOIL could be an alternative
+#define STB_IMAGE_IMPLEMENTATION
+
+#include <playground/Texture.hpp>
+//#include <playground/ControlSystem.hpp>
+//#include <playground/OBJLoader.hpp>
 #include <playground/Mesh.hpp>
 #include <playground/Shader.hpp>
 #include <playground/QWindow.hpp>
@@ -41,10 +45,10 @@ Mesh* CreateTriangle()
 	// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 	
 	GLfloat g_vertex_buffer_data[] = {
-		-1.0f,-1.0f,0.0f, // triangle 1 : begin
-		0.0f, -1.0f, 1.0f,
-		1.0f,-1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
+		-1.0f,-1.0f, 0.0f, /*UV*/ 0.0f, 0.0f,
+		0.0f, -1.0f, 1.0f, /*UV*/ 0.5f, 0.0f,
+		1.0f,-1.0f, 0.0f,  /*UV*/ 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,  /*UV*/ 0.5f, 1.0f
 	};
 
 	unsigned int indices[] =
@@ -84,6 +88,15 @@ int main( void )
 	// Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
 	shader->LoadShader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"); 
+
+
+	//Create textures
+	Texture* tex1 = new Texture("../assets/brick.png");
+	tex1->LoadTexture();
+
+	Texture* tex2 = new Texture("../assets/dirt.png");
+	tex2->LoadTexture();
+
 
 	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.02f, 1000.0f );
 
@@ -172,7 +185,7 @@ int main( void )
 		viewMatrix = camera->CalculateViewMatrix();
 		glUniformMatrix4fv(shader->GetUniformViewID(), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-
+		tex1->UseTexture();
 		m_meshes[0]->RenderMesh();
 
 		modelMatrix = glm::mat4(1);
@@ -181,6 +194,7 @@ int main( void )
 		modelMatrix = glm::rotate(modelMatrix, -rotation, glm::vec3(0,1,0) );
 		glUniformMatrix4fv(shader->GetUniformModelID(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 		
+		tex2->UseTexture();
 		m_meshes[1]->RenderMesh();
 
 		shader->EndUseShader();
@@ -193,6 +207,9 @@ int main( void )
 
 	} // Check if the ESC key was pressed or the window was closed
 	while( window->ShouldClose() == false );
+
+	delete(tex1);
+	delete(tex2);
 
 	// Cleanup shader
 	delete(shader);

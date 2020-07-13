@@ -12,15 +12,19 @@ in vec3 InvViewDir_cameraSpace;
 */
 
 in vec4 vCol;
+in vec2 vUV;
 
 // Ouput data
 out vec4 color;
 
-//uniform sampler2D mainTexSampler;
+// reason why this is automatically identified as the bound texture is because there's only ONE atm.
+// If there were more than one texture we'd have to bind the uniform
+uniform sampler2D mainTexSampler; 
+
 
 void main()
 {
-	color = vCol;
+	color = texture(mainTexSampler, vUV);
 
 	/*
 	vec3 LightColor = vec3(1,1,1);

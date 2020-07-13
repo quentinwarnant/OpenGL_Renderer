@@ -79,6 +79,10 @@ add_executable(playground
 	#playground/ControlSystem.hpp
 	#playground/ControlSystem.cpp
 
+	playground/stb_image.h
+	playground/Texture.cpp
+	playground/Texture.hpp
+
 	playground/Camera.cpp
 	playground/Camera.hpp
 
