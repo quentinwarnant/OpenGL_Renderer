@@ -129,23 +129,26 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 	glDeleteShader(vertexShaderID);
 	glDeleteShader(fragmentShaderID);
 
-	m_shaderProgramID = programID;
+	m_shaderProgramLocation = programID;
 
 
     //Find uniforms
-    m_uniformModelID = glGetUniformLocation(programID, "Model");
-	m_uniformViewID = glGetUniformLocation(programID, "View");
+    m_uniformModelLocation = glGetUniformLocation(programID, "Model");
+	m_uniformViewLocation = glGetUniformLocation(programID, "View");
 	m_uniformProjectionID = glGetUniformLocation(programID, "Projection");
+
+	m_uniformAmbientColorLocation = glGetUniformLocation(programID, "directionalLight.color");
+	m_uniformAmbientIntensityLocation = glGetUniformLocation(programID, "directionalLight.intensity");
 }
 
 void Shader::UnloadShader()
 {
-	glDeleteProgram(m_shaderProgramID);
+	glDeleteProgram(m_shaderProgramLocation);
 }
 
 void Shader::StartUseShader()
 {
-    glUseProgram(m_shaderProgramID);
+    glUseProgram(m_shaderProgramLocation);
 }
 
 void Shader::EndUseShader()
@@ -153,17 +156,28 @@ void Shader::EndUseShader()
     glUseProgram(0);
 }
 
-GLuint Shader::GetUniformModelID()
+GLuint Shader::GetUniformModelLocation()
 {
-    return m_uniformModelID;
+    return m_uniformModelLocation;
 }
 
-GLuint Shader::GetUniformViewID()
+GLuint Shader::GetUniformViewLocation()
 {
-	return m_uniformViewID;
+	return m_uniformViewLocation;
 }
     
-GLuint Shader::GetUniformProjectionID()
+GLuint Shader::GetUniformProjectionLocation()
 {
     return m_uniformProjectionID;
+}
+
+
+GLuint Shader::GetUniformAmbientColorLocation()
+{
+    return m_uniformAmbientColorLocation;
+}
+
+GLuint Shader::GetUniformAmbientIntensityLocation()
+{
+    return m_uniformAmbientIntensityLocation;
 }

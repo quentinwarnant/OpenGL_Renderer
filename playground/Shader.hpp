@@ -14,15 +14,21 @@ public:
     void StartUseShader();
     void EndUseShader();
 
-    GLuint GetUniformModelID();
-    GLuint GetUniformViewID();
-    GLuint GetUniformProjectionID();
+    GLuint GetUniformModelLocation();
+    GLuint GetUniformViewLocation();
+    GLuint GetUniformProjectionLocation();
+    GLuint GetUniformAmbientColorLocation();
+    GLuint GetUniformAmbientIntensityLocation();
+    
 
 private:
-    GLuint m_shaderProgramID;
-    GLuint m_uniformModelID;
-    GLuint m_uniformViewID;
+    GLuint m_shaderProgramLocation;
+    GLuint m_uniformModelLocation;
+    GLuint m_uniformViewLocation;
     GLuint m_uniformProjectionID;
+    GLuint m_uniformAmbientColorLocation;
+    GLuint m_uniformAmbientIntensityLocation;
+
 
     void UnloadShader();
 };

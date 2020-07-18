@@ -95,6 +95,9 @@ add_executable(playground
 	playground/Shader.cpp
 	playground/Shader.hpp
 
+	playground/Lighting/Light.cpp
+	playground/Lighting/Light.hpp
+
 
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader

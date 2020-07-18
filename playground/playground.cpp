@@ -33,6 +33,7 @@ using namespace glm;
 #include <playground/Shader.hpp>
 #include <playground/QWindow.hpp>
 #include <playground/Camera.hpp>
+#include <playground/Lighting/Light.hpp>
 
 const float degToRad = 3.14159265f / 180.0f;
 
@@ -97,6 +98,7 @@ int main( void )
 	Texture* tex2 = new Texture("../assets/dirt.png");
 	tex2->LoadTexture();
 
+	Light* ambientLight = new Light(glm::vec3(1.0f,1.0f,1.0f), 0.2f);
 
 	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.02f, 1000.0f );
 
@@ -171,28 +173,30 @@ int main( void )
 		float rotation = rotationDegrees * degToRad;
 
 		shader->StartUseShader();
-		glUniformMatrix4fv(shader->GetUniformProjectionID(), 1, GL_FALSE, glm::value_ptr(projectionMatrix) );
+		glUniformMatrix4fv(shader->GetUniformProjectionLocation(), 1, GL_FALSE, glm::value_ptr(projectionMatrix) );
 
 		//Model
 		modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
 		modelMatrix = glm::rotate(modelMatrix, rotation, glm::vec3(0,1,0) );
-		glUniformMatrix4fv(shader->GetUniformModelID(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+		glUniformMatrix4fv(shader->GetUniformModelLocation(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
 
 		//View
 		viewMatrix = camera->CalculateViewMatrix();
-		glUniformMatrix4fv(shader->GetUniformViewID(), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+		glUniformMatrix4fv(shader->GetUniformViewLocation(), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
 		tex1->UseTexture();
+		ambientLight->UseLight(shader->GetUniformAmbientColorLocation(), shader->GetUniformAmbientIntensityLocation());
+
 		m_meshes[0]->RenderMesh();
 
 		modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
 		modelMatrix = glm::rotate(modelMatrix, -rotation, glm::vec3(0,1,0) );
-		glUniformMatrix4fv(shader->GetUniformModelID(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+		glUniformMatrix4fv(shader->GetUniformModelLocation(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 		
 		tex2->UseTexture();
 		m_meshes[1]->RenderMesh();
@@ -207,6 +211,8 @@ int main( void )
 
 	} // Check if the ESC key was pressed or the window was closed
 	while( window->ShouldClose() == false );
+
+	delete(ambientLight);
 
 	delete(tex1);
 	delete(tex2);
