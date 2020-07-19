@@ -32,7 +32,7 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int vertCount, unsigned int* i
 			3,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			sizeof(vertices[0]) * 5,// stride , format is 3 vertices & 2 uv value
+			sizeof(vertices[0]) * 8,// stride , format is 3 vertices & 2 uv value
 			(void*)0            // array buffer offset
 		);
         // Enabling these vertex attributes; is fine from the create mesh until we have multiple sub-meshes to render, in which case we may have different attributes 
@@ -40,14 +40,25 @@ void Mesh::CreateMesh(GLfloat* vertices, unsigned int vertCount, unsigned int* i
 
         //UV
         glVertexAttribPointer(
-			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			1,                  // attribute 1.
 			2,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			sizeof(vertices[0]) * 5,// stride , format is 3 vertices & 2 uv value
+			sizeof(vertices[0]) * 8,// stride , format is 3 vertices & 2 uv value
 			(void*)(sizeof(vertices[0]) * 3)// array buffer offset
 		);
 		glEnableVertexAttribArray(1);
+
+ 		//Normal
+        glVertexAttribPointer(
+			2,                  // attribute 2.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			sizeof(vertices[0]) * 8,// stride , format is 3 vertices & 2 uv value
+			(void*)(sizeof(vertices[0]) * 5)// array buffer offset
+		);
+		glEnableVertexAttribArray(2);
 
 
 		//Unbind vertex VBO

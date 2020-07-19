@@ -2,13 +2,17 @@
 
 struct DirectionalLight
 {
-	vec3 color;
-	float intensity;
-};
+	vec3 ambientColor;
+	float ambientIntensity;
 
+	vec3 directionalColor;
+	float directionalIntensity;
+	vec3 direction;
+};
 
 in vec4 vCol;
 in vec2 vUV;
+in vec3 vNormal;
 
 // Ouput data
 out vec4 color;
@@ -18,13 +22,15 @@ out vec4 color;
 uniform sampler2D mainTexSampler; 
 
 
-uniform DirectionalLight directionalLight;
+uniform DirectionalLight dirLight;
 
 
 void main()
 {
-	vec4 directionalLight = vec4( directionalLight.color, 1.0f) * directionalLight.intensity;
-	color = texture(mainTexSampler, vUV) *  directionalLight;
+	vec4 ambientLight = vec4( dirLight.ambientColor, 1.0f) * dirLight.ambientIntensity;
+	vec4 directionalLight = vec4( dirLight.directionalColor, 1.0f) * dirLight.directionalIntensity;
 
+	directionalLight *= max( dot( normalize(vNormal), dirLight.direction) , 0.0f);
 
+	color = texture(mainTexSampler, vUV) *  (ambientLight + directionalLight);
 }

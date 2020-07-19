@@ -14,24 +14,45 @@ public:
     void StartUseShader();
     void EndUseShader();
 
+    void ReloadSources();
+
     GLuint GetUniformModelLocation();
     GLuint GetUniformViewLocation();
     GLuint GetUniformProjectionLocation();
+    
     GLuint GetUniformAmbientColorLocation();
     GLuint GetUniformAmbientIntensityLocation();
+    GLuint GetUniformDirectionalLightColorLocation();
+    GLuint GetUniformDirectionalLightIntensityLocation();
+    GLuint GetUniformDirectionalLightDirectionLocation();
     
 
 private:
+    const char* m_pathVertexShader;
+    const char* m_pathFragmentShader;
+
     GLuint m_shaderProgramLocation;
+
+    //coordinate system Matrices
     GLuint m_uniformModelLocation;
     GLuint m_uniformViewLocation;
     GLuint m_uniformProjectionID;
+
+    //Lighting
     GLuint m_uniformAmbientColorLocation;
     GLuint m_uniformAmbientIntensityLocation;
+    GLuint m_uniformDirectionalLightColorLocation;
+    GLuint m_uniformDirectionalLightIntensityLocation;
+    GLuint m_uniformDirectionalLightDirectionLocation;
 
 
     void UnloadShader();
 };
+
+
+
+
+
 
 class ShaderException : std::exception
 {

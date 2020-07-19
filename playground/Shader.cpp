@@ -24,13 +24,16 @@ Shader::~Shader()
 
 void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentShader)
 {
+	m_pathVertexShader = pathVertexShader;
+	m_pathFragmentShader = pathFragmentShader;
+
 	// Create the shaders
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
 	// Read the Vertex Shader code from the file
 	std::string vertexShaderCode;
-	std::ifstream vertexShaderStream(pathVertexShader, std::ios::in);
+	std::ifstream vertexShaderStream(m_pathVertexShader, std::ios::in);
 	if(vertexShaderStream.is_open()){
 		std::stringstream sstr;
 		sstr << vertexShaderStream.rdbuf();
@@ -39,13 +42,13 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 	}
     else
     {
-		printf("Impossible to open %s. Are you in the right directory ?!\n", pathVertexShader);
+		printf("Impossible to open %s. Are you in the right directory ?!\n", m_pathVertexShader);
 		getchar();
 	}
 
 	// Read the Fragment Shader code from the file
 	std::string fragmentShaderCode;
-	std::ifstream fragmentShaderStream(pathFragmentShader, std::ios::in);
+	std::ifstream fragmentShaderStream(m_pathFragmentShader, std::ios::in);
 	if(fragmentShaderStream.is_open()){
 		std::stringstream sstr;
 		sstr << fragmentShaderStream.rdbuf();
@@ -58,7 +61,7 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 
 
 	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", pathVertexShader);
+	printf("Compiling shader : %s\n", m_pathVertexShader);
 	char const * vertexSourcePointer = vertexShaderCode.c_str();
 	glShaderSource( vertexShaderID, 1, &vertexSourcePointer , NULL);
 	glCompileShader(vertexShaderID);
@@ -75,7 +78,7 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 	}
 
 
-	printf("Compiling shader : %s\n", pathFragmentShader);
+	printf("Compiling shader : %s\n", m_pathFragmentShader);
 	char const * fragmentSourcePointer = fragmentShaderCode.c_str();
 	glShaderSource(fragmentShaderID, 1, &fragmentSourcePointer , NULL);
 	glCompileShader(fragmentShaderID);
@@ -137,8 +140,18 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 	m_uniformViewLocation = glGetUniformLocation(programID, "View");
 	m_uniformProjectionID = glGetUniformLocation(programID, "Projection");
 
-	m_uniformAmbientColorLocation = glGetUniformLocation(programID, "directionalLight.color");
-	m_uniformAmbientIntensityLocation = glGetUniformLocation(programID, "directionalLight.intensity");
+	m_uniformAmbientColorLocation = glGetUniformLocation(programID, "dirLight.ambientColor");
+	m_uniformAmbientIntensityLocation = glGetUniformLocation(programID, "dirLight.ambientIntensity");
+
+	m_uniformDirectionalLightColorLocation = glGetUniformLocation(programID, "dirLight.directionalColor");
+	m_uniformDirectionalLightIntensityLocation = glGetUniformLocation(programID, "dirLight.directionalIntensity");
+	m_uniformDirectionalLightDirectionLocation = glGetUniformLocation(programID, "dirLight.direction");
+}
+
+void Shader::ReloadSources()
+{
+	UnloadShader();
+	LoadShader(m_pathVertexShader, m_pathFragmentShader);
 }
 
 void Shader::UnloadShader()
@@ -180,4 +193,21 @@ GLuint Shader::GetUniformAmbientColorLocation()
 GLuint Shader::GetUniformAmbientIntensityLocation()
 {
     return m_uniformAmbientIntensityLocation;
+}
+
+
+GLuint Shader::GetUniformDirectionalLightColorLocation()
+{
+    return m_uniformDirectionalLightColorLocation;
+}
+
+
+GLuint Shader::GetUniformDirectionalLightIntensityLocation()
+{
+	return m_uniformDirectionalLightIntensityLocation;
+}
+
+GLuint Shader::GetUniformDirectionalLightDirectionLocation()
+{
+	return m_uniformDirectionalLightDirectionLocation;
 }

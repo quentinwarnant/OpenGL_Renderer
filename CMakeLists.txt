@@ -97,6 +97,8 @@ add_executable(playground
 
 	playground/Lighting/Light.cpp
 	playground/Lighting/Light.hpp
+	playground/Lighting/LightDirectional.cpp
+	playground/Lighting/LightDirectional.hpp
 
 
 	playground/SimpleFragmentShader.fragmentshader

@@ -80,6 +80,8 @@ int QWindow::Init()
 	// Dark blue background
 	glClearColor(0.4f, 0.0f, 0.2f, 0.0f);
 
+	glEnable(GL_DEPTH_TEST);
+
 	return 0;
 }
 
@@ -147,8 +149,6 @@ void QWindow::HandleMouseInput(GLFWwindow* window, double mousePosX, double mous
 	// Set mouse pos values ahead of next call
 	thisQWindow->m_mouseLastPosX = mousePosX;
 	thisQWindow->m_mouseLastPosY = mousePosY;
-
-	//printf("Mouse Diff x:%.6f y:%.6f \n", thisQWindow->m_mousePosChangeX, thisQWindow->m_mousePosChangeY);
 
 	thisQWindow->m_mouseHasMoved = true;
 }

@@ -7,14 +7,12 @@ class Light
 {
 public:
     Light();
-    Light(glm::vec3 color, GLfloat intensity);
+    Light(glm::vec3 ambientColor, GLfloat ambientIntensity);
     ~Light();
 
-    void UseLight(GLfloat colorPropertyLocation, GLfloat intensityPropertyLocation);
+    virtual void UseLight(GLint ambientColorPropLocation, GLint ambientIntensityPropLocation);
 
 private:
-    glm::vec3 m_color;
-    GLfloat m_intensity;
-
-
+    glm::vec3 m_ambientColor;
+    GLfloat m_ambientIntensity;
 };
