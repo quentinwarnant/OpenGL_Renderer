@@ -35,6 +35,7 @@ using namespace glm;
 #include <playground/Camera.hpp>
 #include <playground/Lighting/LightDirectional.hpp>
 #include <playground/Lighting/PointLight.hpp>
+#include <playground/Lighting/SpotLight.hpp>
 
 
 const float degToRad = 3.14159265f / 180.0f;
@@ -199,6 +200,21 @@ int main( void )
 										glm::vec3(0,1,0), 0.3f,0.2f, 0.1f );
 	unsigned int pointLightCount = 2;
 
+	//Array of SpotLights
+	SpotLight spotLights[MAX_SPOT_LIGHTS];
+	spotLights[0] = SpotLight(glm::vec3(1.0f, .7f, -3.0f),
+								glm::normalize( glm::vec3(0,-1,0) ),
+								glm::vec3(1,0,1), 0.3f,0.2f, 0.1f,
+								25.0f );
+
+	spotLights[1] = SpotLight(glm::vec3(-3.5f, 0.2f, -2.5f),
+								glm::normalize( glm::vec3(0,-0.5,-1.0f ) ),
+								glm::vec3(1,0,0), 0.3f,0.2f, 0.1f,
+								40.0f );
+
+	unsigned int spotLightCount = 2;
+
+
 	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.02f, 1000.0f );
 
 	glm::mat4 viewMatrix = mat4(1);
@@ -280,22 +296,18 @@ int main( void )
 		//Cam pos
 		glUniform3fv(shader->GetUniformCameraWorldPosLocation(), 1, glm::value_ptr( camera->GetPos() ));
 
-		// pointLight->UseLight(shader->GetUniformPointLightPositionLocation(), shader->GetUniformPointLightColorLocation(),
-		// 						shader->GetUniformPointLightConstantLocation(), shader-> GetUniformPointLightLinearLocation(), shader-> GetUniformPointLightExponentialLocation());
-		
+		//Setup Lights
 		shader->SetDirectionalLight(directionalLight);
 		shader->SetPointLights(pointLights, pointLightCount);
+		shader->SetSpotLights(spotLights, spotLightCount);
 
 
 		//Mesh 1
-
 		shinyMat->UseMaterial(shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation());
 		tex1->UseTexture();
 		m_meshes[0]->RenderMesh();
 
-
-		//MESH 2
-
+		//Mesh 2
 		modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));

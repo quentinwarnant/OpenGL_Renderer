@@ -149,6 +149,7 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 	m_uniformDirectionaLightLocations.direction 		= glGetUniformLocation(programID, "dirLight.direction");
 
 
+	//Point Lights
 	m_uniformPointLightCount = glGetUniformLocation(programID,"pointLightCount");
 	for(size_t i = 0; i < MAX_POINT_LIGHTS; i++)
 	{
@@ -171,6 +172,36 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		m_uniformPointLightLocations[i].exponential = glGetUniformLocation(programID,buff);
 
 	}
+
+	//Spot Lights (spot lights contains a point light info / derives from it)
+	m_uniformSpotLightCount = glGetUniformLocation(programID,"spotLightCount");
+	for(size_t i = 0; i < MAX_SPOT_LIGHTS; i++)
+	{
+		//make up the location string
+		char buff[100] = {'\0'};
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].point.position", i);
+		m_uniformSpotLightLocations[i].position = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].point.color", i);
+		m_uniformSpotLightLocations[i].color = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].point.constant", i);
+		m_uniformSpotLightLocations[i].constant = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].point.linear", i);
+		m_uniformSpotLightLocations[i].linear = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].point.exponential", i);
+		m_uniformSpotLightLocations[i].exponential = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].direction", i);
+		m_uniformSpotLightLocations[i].direction = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "spotLights[%zu].angle", i);
+		m_uniformSpotLightLocations[i].angle = glGetUniformLocation(programID,buff);
+	}
+
 
 	m_uniformSpecularIntensityLocation = glGetUniformLocation(programID, "material.specularIntensity");
 	m_uniformSpecularShininessLocation = glGetUniformLocation(programID, "material.shininess");
@@ -201,8 +232,24 @@ void Shader::SetPointLights(PointLight* lights, GLuint pointLightCount)
 		lights[i].UseLight( m_uniformPointLightLocations[i].position, m_uniformPointLightLocations[i].color,
 								m_uniformPointLightLocations[i].constant, m_uniformPointLightLocations[i].linear, m_uniformPointLightLocations[i].exponential);
 	}
-	 
 }
+
+void Shader::SetSpotLights(SpotLight* lights, GLuint spotLightCount)
+{
+	//Clamp
+	if( spotLightCount > MAX_SPOT_LIGHTS){ spotLightCount = MAX_POINT_LIGHTS;}
+
+	m_spotLightCount = spotLightCount;
+	glUniform1i(m_uniformSpotLightCount, m_spotLightCount );
+
+	for (size_t i = 0; i < m_spotLightCount; i++)
+	{
+		lights[i].UseLight(m_uniformSpotLightLocations[i].position, m_uniformSpotLightLocations[i].direction, m_uniformSpotLightLocations[i].color,
+								m_uniformSpotLightLocations[i].constant, m_uniformSpotLightLocations[i].linear, m_uniformSpotLightLocations[i].exponential,
+								m_uniformSpotLightLocations[i].angle);
+	}
+}
+
 
 void Shader::UnloadShader()
 {

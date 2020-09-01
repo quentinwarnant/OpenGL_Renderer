@@ -106,6 +106,8 @@ add_executable(playground
 	playground/Lighting/LightDirectional.hpp
 	playground/Lighting/PointLight.cpp
 	playground/Lighting/PointLight.hpp
+	playground/Lighting/SpotLight.cpp
+	playground/Lighting/SpotLight.hpp
 
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader

@@ -6,6 +6,7 @@
 #include "Settings.hpp"
 #include "Lighting/LightDirectional.hpp"
 #include "Lighting/PointLight.hpp"
+#include "Lighting/SpotLight.hpp"
 
 class Shader
 {
@@ -22,6 +23,7 @@ public:
 
     void SetDirectionalLight(LightDirectional* light);
     void SetPointLights(PointLight* lights, GLuint pointLightCount);
+    void SetSpotLights(SpotLight* lights, GLuint spotLightCount);
 
 
     GLuint GetUniformModelLocation();
@@ -77,6 +79,20 @@ private:
 
     } m_uniformPointLightLocations[MAX_POINT_LIGHTS];
 
+    // SpotLights
+    GLuint m_spotLightCount;
+    GLuint m_uniformSpotLightCount;
+
+    struct {
+      GLuint color;
+      GLuint position;
+      GLuint direction;
+      GLuint constant;
+      GLuint linear;
+      GLuint exponential;
+      GLuint angle;
+
+    } m_uniformSpotLightLocations[MAX_SPOT_LIGHTS];
 
 
 
