@@ -72,7 +72,6 @@ void CalculateAverageNormals(unsigned int* indices, unsigned int indicesCount, G
 		vertices[in2+2] += normal.z;
 	}
 
-
 	//each vertex was iterated over multiple times, so we want to normalize the normals now
 	for(size_t i=0; i < vertCount / vertexDataLength; i++)
 	{
@@ -318,17 +317,15 @@ int main( void )
 		m_meshes[1]->RenderMesh();
 
 
-		
+        // Floor plane
 		modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
 		glUniformMatrix4fv(shader->GetUniformModelLocation(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 		
 		shinyMat->UseMaterial(shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation());
-		tex2->UseTexture();
+		tex1->UseTexture();
 		m_meshes[2]->RenderMesh();
 
-
-		
 
 		shader->EndUseShader();
 		
@@ -344,7 +341,6 @@ int main( void )
 	//delete(pointLights);
 	delete(directionalLight);
 	
-
 	delete(tex1);
 	delete(tex2);
 
