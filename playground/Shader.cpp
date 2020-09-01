@@ -11,10 +11,9 @@
 
 #include "Shader.hpp"
 
-
 Shader::Shader()
 {
-
+	m_pointLightCount = 0;
 }
 
 Shader::~Shader()
@@ -136,22 +135,73 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 
 
     //Find uniforms
-    m_uniformModelLocation = glGetUniformLocation(programID, "Model");
-	m_uniformViewLocation = glGetUniformLocation(programID, "View");
-	m_uniformProjectionID = glGetUniformLocation(programID, "Projection");
+    m_uniformModelLocation 		= glGetUniformLocation(programID, "Model");
+	m_uniformViewLocation 		= glGetUniformLocation(programID, "View");
+	m_uniformProjectionLocation = glGetUniformLocation(programID, "Projection");
 
-	m_uniformAmbientColorLocation = glGetUniformLocation(programID, "dirLight.ambientColor");
-	m_uniformAmbientIntensityLocation = glGetUniformLocation(programID, "dirLight.ambientIntensity");
+	m_uniformCameraWorldPosLocation = glGetUniformLocation(programID, "cameraWorldPos");
+	
+	m_uniformDirectionaLightLocations.ambientColor 		= glGetUniformLocation(programID, "dirLight.ambientColor");
+	m_uniformDirectionaLightLocations.ambientIntensity 	= glGetUniformLocation(programID, "dirLight.ambientIntensity");
 
-	m_uniformDirectionalLightColorLocation = glGetUniformLocation(programID, "dirLight.directionalColor");
-	m_uniformDirectionalLightIntensityLocation = glGetUniformLocation(programID, "dirLight.directionalIntensity");
-	m_uniformDirectionalLightDirectionLocation = glGetUniformLocation(programID, "dirLight.direction");
+	m_uniformDirectionaLightLocations.directionalColor	= glGetUniformLocation(programID, "dirLight.directionalColor");
+	m_uniformDirectionaLightLocations.directionalColorIntensity = glGetUniformLocation(programID, "dirLight.directionalIntensity");
+	m_uniformDirectionaLightLocations.direction 		= glGetUniformLocation(programID, "dirLight.direction");
+
+
+	m_uniformPointLightCount = glGetUniformLocation(programID,"pointLightCount");
+	for(size_t i = 0; i < MAX_POINT_LIGHTS; i++)
+	{
+		//make up the location string
+		char buff[100] = {'\0'};
+
+		snprintf(buff, sizeof(buff), "pointLights[%zu].position", i);
+		m_uniformPointLightLocations[i].position = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "pointLights[%zu].color", i);
+		m_uniformPointLightLocations[i].color = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "pointLights[%zu].constant", i);
+		m_uniformPointLightLocations[i].constant = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "pointLights[%zu].linear", i);
+		m_uniformPointLightLocations[i].linear = glGetUniformLocation(programID,buff);
+
+		snprintf(buff, sizeof(buff), "pointLights[%zu].exponential", i);
+		m_uniformPointLightLocations[i].exponential = glGetUniformLocation(programID,buff);
+
+	}
+
+	m_uniformSpecularIntensityLocation = glGetUniformLocation(programID, "material.specularIntensity");
+	m_uniformSpecularShininessLocation = glGetUniformLocation(programID, "material.shininess");
 }
 
 void Shader::ReloadSources()
 {
 	UnloadShader();
 	LoadShader(m_pathVertexShader, m_pathFragmentShader);
+}
+
+void Shader::SetDirectionalLight(LightDirectional* light)
+{
+	light->UseLight(m_uniformDirectionaLightLocations.ambientColor, m_uniformDirectionaLightLocations.ambientIntensity,
+							m_uniformDirectionaLightLocations.directionalColor, m_uniformDirectionaLightLocations.directionalColorIntensity, m_uniformDirectionaLightLocations.direction);
+}
+
+void Shader::SetPointLights(PointLight* lights, GLuint pointLightCount)
+{
+	//Clamp
+	if( pointLightCount > MAX_POINT_LIGHTS){ pointLightCount = MAX_POINT_LIGHTS;}
+
+	m_pointLightCount = pointLightCount;
+	glUniform1i(m_uniformPointLightCount, m_pointLightCount );
+
+	for (size_t i = 0; i < m_pointLightCount; i++)
+	{
+		lights[i].UseLight( m_uniformPointLightLocations[i].position, m_uniformPointLightLocations[i].color,
+								m_uniformPointLightLocations[i].constant, m_uniformPointLightLocations[i].linear, m_uniformPointLightLocations[i].exponential);
+	}
+	 
 }
 
 void Shader::UnloadShader()
@@ -181,33 +231,49 @@ GLuint Shader::GetUniformViewLocation()
     
 GLuint Shader::GetUniformProjectionLocation()
 {
-    return m_uniformProjectionID;
+    return m_uniformProjectionLocation;
+}
+
+GLuint Shader::GetUniformCameraWorldPosLocation()
+{
+	return m_uniformCameraWorldPosLocation;
 }
 
 
+//Lighting
 GLuint Shader::GetUniformAmbientColorLocation()
 {
-    return m_uniformAmbientColorLocation;
+    return m_uniformDirectionaLightLocations.ambientColor;
 }
 
 GLuint Shader::GetUniformAmbientIntensityLocation()
 {
-    return m_uniformAmbientIntensityLocation;
+    return m_uniformDirectionaLightLocations.ambientIntensity;
 }
-
 
 GLuint Shader::GetUniformDirectionalLightColorLocation()
 {
-    return m_uniformDirectionalLightColorLocation;
+    return m_uniformDirectionaLightLocations.directionalColor;
 }
-
 
 GLuint Shader::GetUniformDirectionalLightIntensityLocation()
 {
-	return m_uniformDirectionalLightIntensityLocation;
+	return m_uniformDirectionaLightLocations.directionalColorIntensity;
 }
 
 GLuint Shader::GetUniformDirectionalLightDirectionLocation()
 {
-	return m_uniformDirectionalLightDirectionLocation;
+	return m_uniformDirectionaLightLocations.direction;
 }
+
+//Material
+GLuint Shader::GetUniformSpecularIntensityLocation()
+{
+	return m_uniformSpecularIntensityLocation;
+}
+
+GLuint Shader::GetUniformSpecularShininessLocation()
+{
+	return m_uniformSpecularShininessLocation;
+}
+

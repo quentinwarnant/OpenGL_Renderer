@@ -27,13 +27,15 @@ using namespace glm;
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <playground/Texture.hpp>
-//#include <playground/ControlSystem.hpp>
-//#include <playground/OBJLoader.hpp>
+#include <playground/Settings.hpp>
 #include <playground/Mesh.hpp>
 #include <playground/Shader.hpp>
+#include <playground/Material.hpp>
 #include <playground/QWindow.hpp>
 #include <playground/Camera.hpp>
 #include <playground/Lighting/LightDirectional.hpp>
+#include <playground/Lighting/PointLight.hpp>
+
 
 const float degToRad = 3.14159265f / 180.0f;
 
@@ -41,7 +43,7 @@ void CalculateAverageNormals(unsigned int* indices, unsigned int indicesCount, G
 								unsigned int vertexDataLength , unsigned int dataNormalOffset)
 {
 
-	for(size_t i=0; i < indicesCount; i+=3) //iterate through each triangle
+	for(size_t i=0; i < indicesCount; i+=3) //iterate through each pyramid1
 	{
 		unsigned int in0 = indices[i] * vertexDataLength;
 		unsigned int in1 = indices[i+1] * vertexDataLength;
@@ -55,7 +57,7 @@ void CalculateAverageNormals(unsigned int* indices, unsigned int indicesCount, G
 		in1 += dataNormalOffset;
 		in2 += dataNormalOffset;
 		
-		//adding normal value to each vertices in triangle 
+		//adding normal value to each vertices in pyramid1 
 		vertices[in0] += normal.x;
 		vertices[in0+1] += normal.y;
 		vertices[in0+2] += normal.z;
@@ -84,17 +86,17 @@ void CalculateAverageNormals(unsigned int* indices, unsigned int indicesCount, G
 }
 
 // Returns VAO's id
-Mesh* CreateTriangle()
+Mesh* CreatePyramid()
 {
-	//Define a triangle vertices
+	//Define a pyramid1 vertices
 	//An array of 3 vectors which represents 3 vertices
-	// Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
+	// Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a pyramid1.
 	// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 	
 	GLfloat g_vertex_buffer_data[] = {
-		-1.0f,-1.0f, 0.0f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
+		-1.0f,-1.0f, -0.6f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
 		0.0f, -1.0f, 1.0f, /*UV*/ 0.5f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
-		1.0f,-1.0f, 0.0f,  /*UV*/ 1.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
+		1.0f,-1.0f, -0.6f,  /*UV*/ 1.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f,  /*UV*/ 0.5f, 1.0f, /*Normal*/ 0.0f, 0.0f, 0.0f
 	};
 
@@ -107,17 +109,40 @@ Mesh* CreateTriangle()
 	};
 
 	
-	Mesh* triangleMesh = new Mesh();
+	Mesh* mesh = new Mesh();
 	unsigned int dataPerVertex = 8;
 	unsigned int vertCount = sizeof(g_vertex_buffer_data) / sizeof(g_vertex_buffer_data[0]);
 	unsigned int indicesCount = sizeof(indices) / sizeof(indices[0]);
 	
 	CalculateAverageNormals(indices, indicesCount, g_vertex_buffer_data, vertCount,dataPerVertex, dataPerVertex - 3 );
 	
-	
-	triangleMesh->CreateMesh(g_vertex_buffer_data, vertCount, indices, indicesCount);
+	mesh->CreateMesh(g_vertex_buffer_data, vertCount, indices, indicesCount);
 
-	return triangleMesh;
+	return mesh;
+}
+
+Mesh* CreatePlane()
+{
+		GLfloat g_vertex_buffer_data[] = {
+		-10.0f,0.0f, -10.0f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
+		10.0f, 0.0f, -10.0f, /*UV*/ 10.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
+		-10.0f,0.0f, 10.0f,  /*UV*/ 0.0f, 10.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
+		10.0f, 0.0f, 10.0f,  /*UV*/ 10.0f, 10.0f, /*Normal*/ 0.0f, -1.0f, 0.0f
+	};
+
+	unsigned int indices[] =
+	{
+		0, 2, 1,
+		1, 2, 3
+	};
+
+	Mesh* mesh = new Mesh();
+	unsigned int vertCount = sizeof(g_vertex_buffer_data) / sizeof(g_vertex_buffer_data[0]);
+	unsigned int indicesCount = sizeof(indices) / sizeof(indices[0]);
+
+	mesh->CreateMesh(g_vertex_buffer_data, vertCount, indices, indicesCount);
+
+	return mesh;
 }
 
 void ReloadShader(Shader* shaderToReload)
@@ -136,16 +161,21 @@ int main( void )
 
 	//Create two shapes
 	std::vector<Mesh*> m_meshes;
-	Mesh* triangle = CreateTriangle();
-	m_meshes.push_back(triangle);
+	Mesh* pyramid1 = CreatePyramid();
+	m_meshes.push_back(pyramid1);
 	
-	Mesh* triangle2 = CreateTriangle();
-	m_meshes.push_back(triangle2);
+	Mesh* pyramid2 = CreatePyramid();
+	m_meshes.push_back(pyramid2);
+
+	Mesh* floor = CreatePlane();
+	m_meshes.push_back(floor);
 
 	// Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
 	shader->LoadShader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"); 
 
+	Material* shinyMat = new Material(0.8f, 32);
+	Material* dullMat = new Material(0.3f, 4);
 
 	//Create textures
 	Texture* tex1 = new Texture("../assets/brick.png");
@@ -154,10 +184,20 @@ int main( void )
 	Texture* tex2 = new Texture("../assets/dirt.png");
 	tex2->LoadTexture();
 
+	glm::vec3 ambientColor = glm::vec3(1.0f,1.0f,1.0f);
+	GLfloat ambienIntensity = 0.2f;
 	glm::vec3 lightDirection = glm::normalize(glm::vec3(0.5f, -1.0f, 0.5f) ); 
-	LightDirectional* directionalLight = new LightDirectional(	glm::vec3(1.0f,1.0f,1.0f), 0.2f,
-																glm::vec3(0, 0.7f, 0.4f), 1.0f,
+	LightDirectional* directionalLight = new LightDirectional(	ambientColor, ambienIntensity,
+																glm::vec3(0.8f, 0.8f, 0.8f), 1.0f,
 																lightDirection);
+
+	// Array of PointLights
+	PointLight pointLights[MAX_POINT_LIGHTS];
+	pointLights[0] = PointLight(glm::vec3(1.0f, 0.5f, -3.0f),
+										glm::vec3(0,0,1), 0.3f,0.2f, 0.1f );
+	pointLights[1] = PointLight(glm::vec3(3.5f, 0.2f, -2.5f),
+										glm::vec3(0,1,0), 0.3f,0.2f, 0.1f );
+	unsigned int pointLightCount = 2;
 
 	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.02f, 1000.0f );
 
@@ -237,20 +277,46 @@ int main( void )
 		viewMatrix = camera->CalculateViewMatrix();
 		glUniformMatrix4fv(shader->GetUniformViewLocation(), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-		tex1->UseTexture();
-		directionalLight->UseLight(shader->GetUniformAmbientColorLocation(), shader->GetUniformAmbientIntensityLocation(), 
-									shader->GetUniformDirectionalLightColorLocation(), shader->GetUniformDirectionalLightIntensityLocation(), 
-									shader->GetUniformDirectionalLightDirectionLocation() );
+		//Cam pos
+		glUniform3fv(shader->GetUniformCameraWorldPosLocation(), 1, glm::value_ptr( camera->GetPos() ));
 
+		// pointLight->UseLight(shader->GetUniformPointLightPositionLocation(), shader->GetUniformPointLightColorLocation(),
+		// 						shader->GetUniformPointLightConstantLocation(), shader-> GetUniformPointLightLinearLocation(), shader-> GetUniformPointLightExponentialLocation());
+		
+		shader->SetDirectionalLight(directionalLight);
+		shader->SetPointLights(pointLights, pointLightCount);
+
+
+		//Mesh 1
+
+		shinyMat->UseMaterial(shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation());
+		tex1->UseTexture();
 		m_meshes[0]->RenderMesh();
+
+
+		//MESH 2
 
 		modelMatrix = glm::mat4(1);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(1.5f,0,-3));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
 		glUniformMatrix4fv(shader->GetUniformModelLocation(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 		
+		dullMat->UseMaterial(shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation());
 		tex2->UseTexture();
 		m_meshes[1]->RenderMesh();
+
+
+		
+		modelMatrix = glm::mat4(1);
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
+		glUniformMatrix4fv(shader->GetUniformModelLocation(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+		
+		shinyMat->UseMaterial(shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation());
+		tex2->UseTexture();
+		m_meshes[2]->RenderMesh();
+
+
+		
 
 		shader->EndUseShader();
 		
@@ -263,10 +329,15 @@ int main( void )
 	} // Check if the ESC key was pressed or the window was closed
 	while( window->ShouldClose() == false );
 
+	//delete(pointLights);
 	delete(directionalLight);
+	
 
 	delete(tex1);
 	delete(tex2);
+
+	delete(shinyMat);
+	delete(dullMat);
 
 	// Cleanup shader
 	delete(shader);

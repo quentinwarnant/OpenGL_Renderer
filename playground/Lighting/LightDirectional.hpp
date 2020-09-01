@@ -9,7 +9,7 @@ class LightDirectional : public Light
 public:
     LightDirectional();
     LightDirectional(glm::vec3 ambientColor, GLfloat ambientIntensity,
-             glm::vec3 directionalColor, GLfloat directionalIntensity, glm::vec3 direction);
+                        glm::vec3 directionalColor, GLfloat directionalIntensity, glm::vec3 direction);
     ~LightDirectional();
 
     virtual void UseLight(GLint ambientColorPropLocation, GLint ambientIntensityPropLocation,

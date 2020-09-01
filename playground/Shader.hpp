@@ -3,6 +3,10 @@
 #include <exception>
 #include <GL/glew.h>
 
+#include "Settings.hpp"
+#include "Lighting/LightDirectional.hpp"
+#include "Lighting/PointLight.hpp"
+
 class Shader
 {
 public:
@@ -16,9 +20,15 @@ public:
 
     void ReloadSources();
 
+    void SetDirectionalLight(LightDirectional* light);
+    void SetPointLights(PointLight* lights, GLuint pointLightCount);
+
+
     GLuint GetUniformModelLocation();
     GLuint GetUniformViewLocation();
     GLuint GetUniformProjectionLocation();
+
+    GLuint GetUniformCameraWorldPosLocation();
     
     GLuint GetUniformAmbientColorLocation();
     GLuint GetUniformAmbientIntensityLocation();
@@ -26,7 +36,9 @@ public:
     GLuint GetUniformDirectionalLightIntensityLocation();
     GLuint GetUniformDirectionalLightDirectionLocation();
     
-
+    GLuint GetUniformSpecularIntensityLocation();
+    GLuint GetUniformSpecularShininessLocation();
+    
 private:
     const char* m_pathVertexShader;
     const char* m_pathFragmentShader;
@@ -36,14 +48,42 @@ private:
     //coordinate system Matrices
     GLuint m_uniformModelLocation;
     GLuint m_uniformViewLocation;
-    GLuint m_uniformProjectionID;
+    GLuint m_uniformProjectionLocation;
+
+    //?
+    GLuint m_uniformCameraWorldPosLocation;
 
     //Lighting
-    GLuint m_uniformAmbientColorLocation;
-    GLuint m_uniformAmbientIntensityLocation;
-    GLuint m_uniformDirectionalLightColorLocation;
-    GLuint m_uniformDirectionalLightIntensityLocation;
-    GLuint m_uniformDirectionalLightDirectionLocation;
+
+    struct {
+      GLuint ambientColor;
+      GLuint ambientIntensity;
+      GLuint directionalColor;
+      GLuint directionalColorIntensity;
+      GLuint direction;
+
+    } m_uniformDirectionaLightLocations;
+
+    //Current amount of point lights set
+    GLuint m_pointLightCount;
+    GLuint m_uniformPointLightCount;
+
+    struct {
+      GLuint color;
+      GLuint position;
+      GLuint constant;
+      GLuint linear;
+      GLuint exponential;
+
+    } m_uniformPointLightLocations[MAX_POINT_LIGHTS];
+
+
+
+
+    //Material
+    GLuint m_uniformSpecularIntensityLocation;
+    GLuint m_uniformSpecularShininessLocation;
+    
 
 
     void UnloadShader();

@@ -12,6 +12,7 @@ public:
 
     void Update(GLfloat deltaTime, glm::vec2 moveInput, glm::vec2 turnAxesInput);
     glm::mat4 CalculateViewMatrix();
+    glm::vec3 GetPos(){return m_pos;}
 
 
 private: 

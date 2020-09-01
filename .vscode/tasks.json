@@ -20,7 +20,7 @@
             "command": "/usr/local/bin/cmake",
             "args": [
                 "--build",
-                "/Users/quentinwarnant/Dev/OpenGL/opengl_tutorial.org/build",
+                "/Users/quentinwarnant/Dev/OpenGL/MyOpenGLRenderer/OpenGL_Renderer/build",
                 "--config",
                 "Debug",
                 "--target",

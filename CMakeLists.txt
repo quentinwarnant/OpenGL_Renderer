@@ -66,6 +66,8 @@ add_executable(playground
 	playground/QWindow.hpp
 	
 	playground/playground.cpp
+
+	playground/Settings.hpp
 	
 	#common/shader.cpp
 	#common/shader.hpp
@@ -95,11 +97,15 @@ add_executable(playground
 	playground/Shader.cpp
 	playground/Shader.hpp
 
+	playground/Material.cpp
+	playground/Material.hpp
+
 	playground/Lighting/Light.cpp
 	playground/Lighting/Light.hpp
 	playground/Lighting/LightDirectional.cpp
 	playground/Lighting/LightDirectional.hpp
-
+	playground/Lighting/PointLight.cpp
+	playground/Lighting/PointLight.hpp
 
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader
