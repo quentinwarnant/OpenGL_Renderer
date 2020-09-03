@@ -109,8 +109,8 @@ add_executable(playground
 	playground/Lighting/SpotLight.cpp
 	playground/Lighting/SpotLight.hpp
 
-	playground/SimpleFragmentShader.fragmentshader
-	playground/SimpleVertexShader.vertexshader
+		playground/SimpleFragmentShader.shader
+		playground/SimpleVertexShader.shader
 )
 target_link_libraries(playground
 	${ALL_LIBS}

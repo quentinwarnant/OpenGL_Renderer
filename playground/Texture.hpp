@@ -11,7 +11,8 @@ public:
     ~Texture();
     
 
-    void LoadTexture();
+    bool LoadTextureNoAlpha();
+    bool LoadTextureWithAlpha();
     void UseTexture();
     void ClearTexture();
 

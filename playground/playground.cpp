@@ -172,17 +172,17 @@ int main( void )
 
 	// Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
-	shader->LoadShader("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"); 
+	shader->LoadShader("SimpleVertexShader.shader", "SimpleFragmentShader.shader");
 
 	Material* shinyMat = new Material(0.8f, 32);
 	Material* dullMat = new Material(0.3f, 4);
 
 	//Create textures
 	Texture* tex1 = new Texture("../assets/brick.png");
-	tex1->LoadTexture();
+    tex1->LoadTextureNoAlpha();
 
 	Texture* tex2 = new Texture("../assets/dirt.png");
-	tex2->LoadTexture();
+    tex2->LoadTextureNoAlpha();
 
 	glm::vec3 ambientColor = glm::vec3(1.0f,1.0f,1.0f);
 	GLfloat ambienIntensity = 0.2f;
