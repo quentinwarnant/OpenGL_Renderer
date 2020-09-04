@@ -179,10 +179,10 @@ int main( void )
 
 	//Create textures
 	Texture* tex1 = new Texture("../assets/brick.png");
-    tex1->LoadTextureNoAlpha();
+    tex1->LoadTextureWithAlpha();
 
 	Texture* tex2 = new Texture("../assets/dirt.png");
-    tex2->LoadTextureNoAlpha();
+    tex2->LoadTextureWithAlpha();
 
 	glm::vec3 ambientColor = glm::vec3(1.0f,1.0f,1.0f);
 	GLfloat ambienIntensity = 0.2f;
