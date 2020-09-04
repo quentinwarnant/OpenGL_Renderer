@@ -37,6 +37,8 @@ using namespace glm;
 #include <playground/Lighting/PointLight.hpp>
 #include <playground/Lighting/SpotLight.hpp>
 
+#include <assimp/Importer.hpp>
+#include <playground/Model.hpp>
 
 const float degToRad = 3.14159265f / 180.0f;
 
@@ -123,6 +125,10 @@ Mesh* CreatePyramid()
 
 Mesh* CreatePlane()
 {
+	Assimp::Importer importer = Assimp::Importer();
+    importer.GetOrphanedScene();
+    
+
 		GLfloat g_vertex_buffer_data[] = {
 		-10.0f,0.0f, -10.0f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
 		10.0f, 0.0f, -10.0f, /*UV*/ 10.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
@@ -169,6 +175,10 @@ int main( void )
 
 	Mesh* floor = CreatePlane();
 	m_meshes.push_back(floor);
+
+	Model* externalModel = new Model();
+	externalModel->LoadModel("../assets/Models/CobbleStones.obj");
+
 
 	// Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
@@ -326,6 +336,14 @@ int main( void )
 		tex1->UseTexture();
 		m_meshes[2]->RenderMesh();
 
+
+		// external Model
+		modelMatrix = glm::mat4(1);
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2,0.2,0.2));
+		glUniformMatrix4fv(shader->GetUniformModelLocation(), 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+		shinyMat->UseMaterial(shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation());
+		externalModel->RenderModel();
 
 		shader->EndUseShader();
 		

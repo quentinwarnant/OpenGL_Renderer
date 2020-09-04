@@ -164,7 +164,9 @@ set(ZLIB_LIBRARIES zlib)
 set(BUILD_STATIC_LIB ON)
 #set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/zlib)
 add_subdirectory( assimp-3.0.1270/code )
-
+include_directories(
+	assimp-3.0.1270/include
+)
 
 ### BULLET ###
 # Bullet already has a CMakeLists.txt so let's use these

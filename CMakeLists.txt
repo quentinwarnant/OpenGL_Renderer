@@ -100,6 +100,9 @@ add_executable(playground
 	playground/Material.cpp
 	playground/Material.hpp
 
+	playground/Model.cpp
+	playground/Model.hpp
+
 	playground/Lighting/Light.cpp
 	playground/Lighting/Light.hpp
 	playground/Lighting/LightDirectional.cpp
@@ -109,8 +112,8 @@ add_executable(playground
 	playground/Lighting/SpotLight.cpp
 	playground/Lighting/SpotLight.hpp
 
-		playground/SimpleFragmentShader.shader
-		playground/SimpleVertexShader.shader
+	playground/SimpleFragmentShader.shader
+	playground/SimpleVertexShader.shader
 )
 target_link_libraries(playground
 	${ALL_LIBS}
