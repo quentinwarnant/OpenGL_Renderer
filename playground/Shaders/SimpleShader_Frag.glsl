@@ -43,6 +43,7 @@ in vec4 vCol;
 in vec2 vUV;
 in vec3 vNormal;
 in vec3 FragPos; // worldspace pos
+in vec4 DirectionalLightSpacePos;
 
 // Ouput data
 out vec4 color;
@@ -61,6 +62,23 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform Material material;
 uniform vec3 cameraWorldPos;
 
+uniform sampler2D directionalShadowMap;
+
+float CalcDirectionalShadowFactor(DirectionalLight light)
+{
+	//First need to transform these coordinates to device coordinates (projection coords) by dividing coords by W (-1 to 1)
+	vec3 projCoords = DirectionalLightSpacePos.xyz / DirectionalLightSpacePos.w;
+	// Convert to 0-1 scale (like depth map should)
+	projCoords = (projCoords * 0.5) + 0.5;
+
+	//Figure out the closest point based on the light's depthmap
+	float closestToLight = texture(directionalShadowMap, projCoords.xy).r; //orthogonal view allows us to just use XY coordinates (perspective wouldn't)
+	float current = projCoords.z; // how far this fragment actually is
+
+	//if the current fragment's depth is larger than the closest object in the light's depth map, it's "in shadow"
+	float shadow = current > closestToLight ? 1.0 : 0.0f;
+	return shadow;
+}
 
 vec4 CalcDirectionalLight()
 {
@@ -84,7 +102,9 @@ vec4 CalcDirectionalLight()
 		}
 	}
 
-	vec4 finalDirLight = (ambientLight + diffuseColor + specularColor);
+	float shadow = CalcDirectionalShadowFactor(dirLight);
+
+	vec4 finalDirLight = ambientLight + ( (1.0-shadow) * ( diffuseColor + specularColor));
 
 	return finalDirLight;
 }

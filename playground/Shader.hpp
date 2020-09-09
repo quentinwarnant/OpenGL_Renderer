@@ -2,6 +2,8 @@
 
 #include <exception>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Settings.hpp"
 #include "Lighting/LightDirectional.hpp"
@@ -24,7 +26,9 @@ public:
     void SetDirectionalLight(LightDirectional* light);
     void SetPointLights(PointLight* lights, GLuint pointLightCount);
     void SetSpotLights(SpotLight* lights, GLuint spotLightCount);
-
+    void SetTexture(GLuint textureUnit);
+    void SetDirectionalShadowMap(GLuint textureUnit);
+    void SetDirectionalLightTransform(glm::mat4* lightTransform);
 
     GLuint GetUniformModelLocation();
     GLuint GetUniformViewLocation();
@@ -94,7 +98,9 @@ private:
 
     } m_uniformSpotLightLocations[MAX_SPOT_LIGHTS];
 
-
+    GLuint m_uniformTexture;
+    GLuint m_uniformDirectionalLightTransform;
+    GLuint m_uniformDirectionalShadowMap;
 
     //Material
     GLuint m_uniformSpecularIntensityLocation;

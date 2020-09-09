@@ -143,7 +143,7 @@ void Model::LoadMaterial(const aiScene* scene)
                 std::string fileName = originalPathStr.substr(lastBackSlashPos+1);
                 std::string newPath = std::string("../assets/") + fileName;
 
-                printf("loading material texture at path: %s", newPath.c_str());
+                printf("loading material texture at path: %s\n", newPath.c_str());
                 m_textures[i] = new Texture(newPath.c_str());
 
                 if( m_textures[i]->LoadTextureWithAlpha() == false)

@@ -14,15 +14,18 @@ uniform mat4 MVP;
 uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 Projection;
+uniform mat4 directionalLightSpaceTransform; // projection (ortho) * view
 
 out vec4 vCol;
 out vec2 vUV;
 out vec3 vNormal;
 out vec3 FragPos;
+out vec4 DirectionalLightSpacePos;
 
 void main()
 {
     gl_Position = Projection * View * Model * vec4(vertexPosition_modelspace ,1);
+    DirectionalLightSpacePos = directionalLightSpaceTransform * Model * vec4(vertexPosition_modelspace,1);
     FragPos = (Model * vec4(vertexPosition_modelspace,1)).xyz;
     vCol = vec4( clamp(vertexPosition_modelspace, 0, 1),1);
 

@@ -62,58 +62,41 @@ add_definitions(
 # User playground
 add_executable(playground 
 
-	playground/QWindow.cpp
-	playground/QWindow.hpp
+	playground/QWindow.cpp playground/QWindow.hpp
 	
 	playground/playground.cpp
 
 	playground/Settings.hpp
 	
-	#common/shader.cpp
-	#common/shader.hpp
-
-	#common/vboindexer.cpp
-	#common/vboindexer.hpp
-
-	#playground/ImageLoader.cpp
-	#playground/ImageLoader.hpp
-
-	#playground/ControlSystem.hpp
-	#playground/ControlSystem.cpp
-
 	playground/stb_image.h
-	playground/Texture.cpp
-	playground/Texture.hpp
+	playground/Texture.cpp playground/Texture.hpp
 
-	playground/Camera.cpp
-	playground/Camera.hpp
+	playground/Camera.cpp playground/Camera.hpp
 
-	playground/OBJLoader.hpp
-	playground/OBJLoader.cpp
+	playground/OBJLoader.hpp playground/OBJLoader.cpp
 
-	playground/Mesh.cpp
-	playground/Mesh.hpp
+	playground/Mesh.cpp playground/Mesh.hpp
 
-	playground/Shader.cpp
-	playground/Shader.hpp
+	playground/Shader.cpp playground/Shader.hpp
 
-	playground/Material.cpp
-	playground/Material.hpp
+	playground/Material.cpp playground/Material.hpp
 
-	playground/Model.cpp
-	playground/Model.hpp
+	playground/Model.cpp playground/Model.hpp
 
-	playground/Lighting/Light.cpp
-	playground/Lighting/Light.hpp
-	playground/Lighting/LightDirectional.cpp
-	playground/Lighting/LightDirectional.hpp
-	playground/Lighting/PointLight.cpp
-	playground/Lighting/PointLight.hpp
-	playground/Lighting/SpotLight.cpp
-	playground/Lighting/SpotLight.hpp
+	playground/Lighting/Light.cpp playground/Lighting/Light.hpp
+	playground/Lighting/LightDirectional.cpp playground/Lighting/LightDirectional.hpp
+	playground/Lighting/PointLight.cpp 	playground/Lighting/PointLight.hpp
+	playground/Lighting/SpotLight.cpp playground/Lighting/SpotLight.hpp
+	playground/Lighting/ShadowMap.cpp playground/Lighting/ShadowMap.h
 
-	playground/SimpleFragmentShader.shader
-	playground/SimpleVertexShader.shader
+	playground/Shaders/SimpleShader_Frag.glsl
+	playground/Shaders/SimpleShader_Vert.glsl
+	playground/Shaders/directionalShadowMap_Frag.glsl
+	playground/Shaders/directionalShadowMap_Vert.glsl
+
+
+
+
 )
 target_link_libraries(playground
 	${ALL_LIBS}

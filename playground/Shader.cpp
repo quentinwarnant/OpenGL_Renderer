@@ -201,7 +201,9 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		snprintf(buff, sizeof(buff), "spotLights[%zu].angle", i);
 		m_uniformSpotLightLocations[i].angle = glGetUniformLocation(programID,buff);
 	}
-
+    m_uniformTexture = glGetUniformLocation(programID, "mainTexSampler");
+    m_uniformDirectionalLightTransform = glGetUniformLocation(programID, "directionalLightSpaceTransform");
+    m_uniformDirectionalShadowMap = glGetUniformLocation(programID, "directionalShadowMap");
 
 	m_uniformSpecularIntensityLocation = glGetUniformLocation(programID, "material.specularIntensity");
 	m_uniformSpecularShininessLocation = glGetUniformLocation(programID, "material.shininess");
@@ -322,5 +324,20 @@ GLuint Shader::GetUniformSpecularIntensityLocation()
 GLuint Shader::GetUniformSpecularShininessLocation()
 {
 	return m_uniformSpecularShininessLocation;
+}
+
+void Shader::SetTexture(GLuint textureUnit)
+{
+    glUniform1i(m_uniformTexture, textureUnit);
+}
+
+void Shader::SetDirectionalShadowMap(GLuint textureUnit)
+{
+    glUniform1i(m_uniformDirectionalShadowMap, textureUnit);
+}
+
+void Shader::SetDirectionalLightTransform(glm::mat4 *lightTransform)
+{
+    glUniformMatrix4fv(m_uniformDirectionalLightTransform,1, GL_FALSE, glm::value_ptr(*lightTransform));
 }
 

@@ -182,7 +182,7 @@ int main( void )
 
 	// Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
-	shader->LoadShader("SimpleVertexShader.shader", "SimpleFragmentShader.shader");
+	shader->LoadShader("Shaders/SimpleShader_Vert.glsl", "Shaders/SimpleShader_Frag.glsl");
 
 	Material* shinyMat = new Material(0.8f, 32);
 	Material* dullMat = new Material(0.3f, 4);
