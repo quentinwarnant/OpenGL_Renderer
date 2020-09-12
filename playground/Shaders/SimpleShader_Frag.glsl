@@ -76,13 +76,12 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
 	float current = projCoords.z; // how far this fragment actually is
 
 	//if the current fragment's depth is larger than the closest object in the light's depth map, it's "in shadow"
-	float shadow = current > closestToLight ? 1.0 : 0.0f;
+	float shadow = (current > closestToLight) ? 1.0 : 0.0f;
 	return shadow;
 }
 
 vec4 CalcDirectionalLight()
 {
-	vec4 ambientLight = vec4( dirLight.ambientColor, 1.0f) * dirLight.ambientIntensity;
 	vec4 diffuseColor = vec4( dirLight.directionalColor, 1.0f) * dirLight.directionalIntensity;
 
 	float diffuseFactor =  max( dot( normalize(vNormal), dirLight.direction) , 0.0f);
@@ -104,7 +103,7 @@ vec4 CalcDirectionalLight()
 
 	float shadow = CalcDirectionalShadowFactor(dirLight);
 
-	vec4 finalDirLight = ambientLight + ( (1.0-shadow) * ( diffuseColor + specularColor));
+	vec4 finalDirLight = (1.0-shadow) * ( diffuseColor + specularColor);
 
 	return finalDirLight;
 }
@@ -186,9 +185,10 @@ vec4 CalcSpotLights()
 
 void main()
 {
-	vec4 ambientLightColor = CalcDirectionalLight();
+	vec4 ambientLight = vec4( dirLight.ambientColor, 1.0f) * dirLight.ambientIntensity;
+	vec4 directionalLightColor = CalcDirectionalLight();
 	vec4 pointLightsColor = CalcPointLights();
 	vec4 spotLightsColor = CalcSpotLights();
 
-	color = texture(mainTexSampler, vUV) *  (ambientLightColor + pointLightsColor + spotLightsColor );
+	color = texture(mainTexSampler, vUV)*  (ambientLight + directionalLightColor + pointLightsColor + spotLightsColor );
 }

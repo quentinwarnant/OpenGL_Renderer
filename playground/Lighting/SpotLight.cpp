@@ -16,10 +16,7 @@ SpotLight::SpotLight(glm::vec3 position, glm::vec3 spotDirection, glm::vec3 spot
 }
 
 
-SpotLight::~SpotLight()
-{
-
-}
+SpotLight::~SpotLight() = default;
 
 
 void SpotLight::UseLight(GLuint positionPropLocation, GLuint directionPropLocation, GLuint colorPropLocation, 

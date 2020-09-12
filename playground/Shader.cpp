@@ -336,8 +336,8 @@ void Shader::SetDirectionalShadowMap(GLuint textureUnit)
     glUniform1i(m_uniformDirectionalShadowMap, textureUnit);
 }
 
-void Shader::SetDirectionalLightTransform(glm::mat4 *lightTransform)
+void Shader::SetDirectionalLightTransform(glm::mat4 lightTransform)
 {
-    glUniformMatrix4fv(m_uniformDirectionalLightTransform,1, GL_FALSE, glm::value_ptr(*lightTransform));
+    glUniformMatrix4fv(m_uniformDirectionalLightTransform,1, GL_FALSE, glm::value_ptr(lightTransform));
 }
 

@@ -40,18 +40,17 @@ bool ShadowMap::Init(GLuint shadowMapWidth, GLuint shadowMapHeight)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     //Now we're binding our FBO to this texture so when we write to the FBO it will update this texture
-    //TODO: consider replacing GL_DRAW_FRAMEBUFFER with GL_FRAMEBUFFER in both below:
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_FBO);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMapID, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMapID, 0);
 
     //FrameBuffer won't read or draw from "color attachements "
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    auto status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+    auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if( status != GL_FRAMEBUFFER_COMPLETE)
     {
-        printf("FrameBuffer init error %s", status);
+        printf("FrameBuffer init error %i", status);
         return false;
     }
 

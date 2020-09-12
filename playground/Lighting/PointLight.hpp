@@ -1,7 +1,7 @@
 #pragma once
 #include "Light.hpp"
 
-class PointLight : Light //TODO: Currently not actually making use of this derivation (which is why it's actually private) - Revisit whether to store "color" inside base class, and have ambient be a special extra property of directional light
+class PointLight : Light
 {
 public:
     PointLight();
@@ -9,7 +9,7 @@ public:
     ~PointLight();
 
     void UseLight( GLuint pointPositionPropLocation, GLuint pointColorPropLocation, 
-                    GLuint pointConstPropLocation, GLuint pointLinPropLocation, GLuint pointExpPropLocation);
+                    GLuint pointConstPropLocation, GLuint pointLinPropLocation, GLuint pointExpPropLocation) const;
 
 protected:
     glm::vec3 m_position;
