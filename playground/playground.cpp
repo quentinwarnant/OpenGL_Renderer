@@ -18,11 +18,6 @@ GLFWwindow* window;
 
 using namespace glm;
 
-
-//Load Shaders helper
-//#include <common/shader.hpp>
-//#include <common/vboindexer.hpp>
-
 //Image loading library STB_IMAGE - SOIL could be an alternative
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -44,8 +39,6 @@ const float c_degToRad = 3.14159265f / 180.0f;
 const GLsizei c_windowSizeW = 768;
 const GLsizei c_windowSizeH = 480;
 
-glm::mat4 m_directionalLightTransform; //tmp in attempt to see if value get's lost otherwise
-glm::mat4 m_directionalLightViewMatrix;
 void glErrorCheck(const char* msg)
 {
     printf( msg);
@@ -317,8 +310,8 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader,
     glErrorCheck("directional Shadowmap - Get Depth attachement name\n");
 
     GLuint uniformModel = directionalShadowShader->GetUniformModelLocation();
-    m_directionalLightTransform = directionalLight->CalculateLightTransform();
-    directionalShadowShader->SetDirectionalLightTransform( &m_directionalLightTransform );
+    glm::mat4 directionalLightTransform = directionalLight->CalculateLightTransform();
+    directionalShadowShader->SetDirectionalLightTransform( &directionalLightTransform );
 
     glErrorCheck("directional Shadowmap - Before render scene\n");
 
@@ -375,8 +368,8 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
     shader->SetDirectionalLight(directionalLight);
     shader->SetPointLights(pointLights, pointLightCount);
     shader->SetSpotLights(spotLights, spotLightCount);
-    m_directionalLightTransform = directionalLight->CalculateLightTransform();
-    shader->SetDirectionalLightTransform( &m_directionalLightTransform);
+    glm::mat4 directionalLightTransform = directionalLight->CalculateLightTransform();
+    shader->SetDirectionalLightTransform( &directionalLightTransform);
 
     glErrorCheck("Main pass - Before Read ShadowMap\n");
 
