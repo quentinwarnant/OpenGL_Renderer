@@ -228,7 +228,7 @@ void ReloadShader(Shader* shaderToReload)
 	shaderToReload->ReloadSources();
 }
 
-void RenderScene( bool depthPass, GLuint uniformModel, glm::mat4 modelMatrix,
+void RenderScene( GLuint uniformModel, glm::mat4 modelMatrix,
                     GLuint uniformSpecIntensity, GLuint uniformSpecShininess,
                     Material* shinyMat, Material* dullMat, Texture* tex1, Texture* tex2,
                     std::vector<Mesh*> meshes, Model* externalModel,
@@ -245,13 +245,10 @@ void RenderScene( bool depthPass, GLuint uniformModel, glm::mat4 modelMatrix,
     glErrorCheck("RenderScene- after Model init\n");
 
     //Mesh 1
-    if(!depthPass)
-    {
-        shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-        glErrorCheck("RenderScene-  Mesh 1 after Use Material\n");
-        tex1->UseTexture();
-        glErrorCheck("RenderScene-  Mesh 1 after Use Texture\n");
-    }
+    shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+    glErrorCheck("RenderScene-  Mesh 1 after Use Material\n");
+    tex1->UseTexture();
+    glErrorCheck("RenderScene-  Mesh 1 after Use Texture\n");
     meshes[0]->RenderMesh();
 
     glErrorCheck("RenderScene- after Mesh 1\n");
@@ -262,11 +259,8 @@ void RenderScene( bool depthPass, GLuint uniformModel, glm::mat4 modelMatrix,
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
-    if(!depthPass)
-    {
-        dullMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-        tex2->UseTexture();
-    }
+    dullMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+    tex2->UseTexture();
     meshes[1]->RenderMesh();
     glErrorCheck("RenderScene- after Mesh 2\n");
 
@@ -276,21 +270,18 @@ void RenderScene( bool depthPass, GLuint uniformModel, glm::mat4 modelMatrix,
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
-    if(!depthPass)
-    {
-        shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-        tex1->UseTexture();
-    }
+    shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+    tex1->UseTexture();
     meshes[2]->RenderMesh();
 
     // external Model
-    //modelMatrix = glm::mat4(1);
-    //modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
-    //modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2,0.2,0.2));
-    //glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
+    modelMatrix = glm::mat4(1);
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2,0.2,0.2));
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
-    //shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-    //externalModel->RenderModel();
+    shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+    externalModel->RenderModel();
 
     glErrorCheck("RenderScene- after Model 1\n");
 }
@@ -331,7 +322,7 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader,
 
     glErrorCheck("directional Shadowmap - Before render scene\n");
 
-    RenderScene( true, uniformModel, modelMatrix,
+    RenderScene( uniformModel, modelMatrix,
                  0, 0,
                 shinyMat, dullMat, tex1, tex2,
                 meshes, externalModel,
@@ -394,7 +385,7 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
     shader->SetDirectionalShadowMap(1); // let the shader know that the shadowmap is in texture unit 1
 
     glErrorCheck("Main pass - Before Render Scene\n");
-    RenderScene( false, uniformModel, modelMatrix,
+    RenderScene( uniformModel, modelMatrix,
                 shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation(),
                 shinyMat, dullMat, tex1, tex2,
                 meshes, externalModel,
