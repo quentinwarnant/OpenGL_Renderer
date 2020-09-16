@@ -17,7 +17,7 @@ public:
 
     GLuint GetShadowWidth(){return m_shadowMapWidth;}
     GLuint GetShadowHeight(){return m_shadowMapHeight;}
-
+    GLuint GetShadowMapTexID(){return m_shadowMapID;}
 
 protected:
     GLuint m_FBO; // shadowmap Frame Buffer Object

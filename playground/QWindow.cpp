@@ -30,6 +30,7 @@ QWindow::~QWindow()
 
 int QWindow::Init()
 {
+
     // Initialise GLFW
 	if( !glfwInit() )
 	{
@@ -71,6 +72,17 @@ int QWindow::Init()
 		glfwTerminate();
 		return 1;
 	}
+    CheckForGLError("after glewInit - Safe to ignore (?)");
+
+
+	GLint type = -1;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &type );
+    printf("depth attachement object type: %i\n ", type); //GL_FRAMEBUFFER_DEFAULT
+    CheckForGLError("depth attachement object type");
+
+    GLint depthSize = -1;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthSize );
+    printf("depthSize: %i bits\n ", depthSize);
 
 	glViewport(0,0,m_windowBufferWidth, m_windowBufferHeight);
 
@@ -79,13 +91,56 @@ int QWindow::Init()
 
 	// Dark blue background
 	glClearColor(0.4f, 0.4f, 0.5f, 0.0f);
-
 	glEnable(GL_DEPTH_TEST);
+	glClearDepth(1.0);
+    glDepthFunc(GL_LESS);
 
-	return 0;
+    CheckForGLError("after enabling depth");
+
+    return 0;
 }
 
+void QWindow::CheckForGLError(const char* msg){
+    GLenum err = glGetError();
+    if( err != GL_NO_ERROR)
+    {
+        fprintf(stderr, msg);
+        fprintf(stderr, " GL ERROR - ");
 
+        if( err == GL_INVALID_FRAMEBUFFER_OPERATION)
+        {
+            fprintf(stderr, "GL_INVALID_FRAMEBUFFER_OPERATION\n");
+        }
+        if( err == GL_INVALID_ENUM)
+        {
+            fprintf(stderr, "GL_INVALID_ENUM\n");
+        }
+        if( err == GL_INVALID_VALUE)
+        {
+            fprintf(stderr, "GL_INVALID_VALUE\n");
+        }
+        if( err == GL_INVALID_OPERATION)
+        {
+            fprintf(stderr, "GL_INVALID_OPERATION\n");
+        }
+        if( err == GL_INVALID_FRAMEBUFFER_OPERATION)
+        {
+            fprintf(stderr, "GL_INVALID_FRAMEBUFFER_OPERATION\n");
+        }
+        if( err == GL_OUT_OF_MEMORY)
+        {
+            fprintf(stderr, "GL_OUT_OF_MEMORY\n");
+        }
+        if( err == GL_STACK_UNDERFLOW)
+        {
+            fprintf(stderr, "GL_STACK_UNDERFLOW\n");
+        }
+        if( err == GL_STACK_OVERFLOW)
+        {
+            fprintf(stderr, "GL_STACK_OVERFLOW\n");
+        }
+    }
+}
 void QWindow::InitCallbacks()
 {
 	glfwSetKeyCallback(m_mainWindow, HandleKeyboardInput);

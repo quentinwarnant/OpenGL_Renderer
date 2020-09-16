@@ -44,6 +44,56 @@ const float c_degToRad = 3.14159265f / 180.0f;
 const GLsizei c_windowSizeW = 768;
 const GLsizei c_windowSizeH = 480;
 
+glm::mat4 m_directionalLightTransform; //tmp in attempt to see if value get's lost otherwise
+glm::mat4 m_directionalLightViewMatrix;
+void glErrorCheck(const char* msg)
+{
+    printf( msg);
+
+    GLenum err = glGetError();
+    if( err != GL_NO_ERROR)
+    {
+
+        if( err == GL_INVALID_FRAMEBUFFER_OPERATION)
+        {
+            printf( "GL_INVALID_FRAMEBUFFER_OPERATION\n");
+        }
+        if( err == GL_INVALID_ENUM)
+        {
+            printf( "GL_INVALID_ENUM\n");
+        }
+        if( err == GL_INVALID_VALUE)
+        {
+            printf( "GL_INVALID_VALUE\n");
+        }
+        if( err == GL_INVALID_OPERATION)
+        {
+            printf( "GL_INVALID_OPERATION\n");
+        }
+        if( err == GL_INVALID_FRAMEBUFFER_OPERATION)
+        {
+            printf( "GL_INVALID_FRAMEBUFFER_OPERATION\n");
+        }
+        if( err == GL_OUT_OF_MEMORY)
+        {
+            printf( "GL_OUT_OF_MEMORY\n");
+        }
+        if( err == GL_STACK_UNDERFLOW)
+        {
+            printf("GL_STACK_UNDERFLOW\n");
+        }
+        if( err == GL_STACK_OVERFLOW)
+        {
+            printf("GL_STACK_OVERFLOW\n");
+        }
+    }
+    else{
+        printf(" no error\n");
+    }
+
+
+}
+
 void CalculateAverageNormals(unsigned int* indices, unsigned int indicesCount, GLfloat* vertices, unsigned int vertCount,
 								unsigned int vertexDataLength , unsigned int dataNormalOffset)
 {
@@ -98,18 +148,18 @@ Mesh* CreatePyramid()
 	// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 	
 	GLfloat g_vertex_buffer_data[] = {
-		-1.0f,-1.0f, -0.6f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 1.0f, /*UV*/ 0.5f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
-		1.0f,-1.0f, -0.6f,  /*UV*/ 1.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, -1.0f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, -1.0f, /*UV*/ 0.5f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
+		0.0f,0.0f, 1.0f,  /*UV*/ 1.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f,  /*UV*/ 0.5f, 1.0f, /*Normal*/ 0.0f, 0.0f, 0.0f
 	};
 
 	unsigned int indices[] =
 	{
-		0, 3, 1,
-		1, 3, 2,
-		2, 3, 0,
-		0, 1, 2
+		0, 1, 2,
+		0, 1, 3,
+		1, 2, 3,
+		2, 0, 3
 	};
 
 	
@@ -127,21 +177,17 @@ Mesh* CreatePyramid()
 
 Mesh* CreatePlane()
 {
-	Assimp::Importer importer = Assimp::Importer();
-    importer.GetOrphanedScene();
-    
-
-		GLfloat g_vertex_buffer_data[] = {
+    GLfloat g_vertex_buffer_data[] = {
 		-10.0f,0.0f, -10.0f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
-		10.0f, 0.0f, -10.0f, /*UV*/ 10.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
-		-10.0f,0.0f, 10.0f,  /*UV*/ 0.0f, 10.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
-		10.0f, 0.0f, 10.0f,  /*UV*/ 10.0f, 10.0f, /*Normal*/ 0.0f, -1.0f, 0.0f
+		10.0f, 0.0f, -10.0f, /*UV*/ 1.0f, 0.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
+		-10.0f,0.0f, 10.0f,  /*UV*/ 0.0f, 1.0f, /*Normal*/ 0.0f, -1.0f, 0.0f,
+		10.0f, 0.0f, 10.0f,  /*UV*/ 1.0f, 1.0f, /*Normal*/ 0.0f, -1.0f, 0.0f
 	};
 
 	unsigned int indices[] =
 	{
-		0, 2, 1,
-		1, 2, 3
+		0, 1, 2,
+		1, 3, 2
 	};
 
 	Mesh* mesh = new Mesh();
@@ -153,56 +199,100 @@ Mesh* CreatePlane()
 	return mesh;
 }
 
+Mesh* CreateScreenspaceQuad()
+{
+    GLfloat g_vertex_buffer_data[] = {
+            0.0f,0.0f, 0.0f, /*UV*/ 0.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, -1.0f,
+            1.0f, 0.0f, 0.0f, /*UV*/ 1.0f, 0.0f, /*Normal*/ 0.0f, 0.0f, -1.0f,
+            0.0f,1.0f, 0.0f,  /*UV*/ 0.0f, 1.0f, /*Normal*/ 0.0f, 0.0f, -1.0f,
+            1.0f, 1.0f, 0.0f,  /*UV*/ 1.0f, 1.0f, /*Normal*/ 0.0f, 0.0f, -1.0f
+    };
+
+    unsigned int indices[] =
+            {
+                    0, 1, 2,
+                    1, 3, 2
+            };
+
+    Mesh* mesh = new Mesh();
+    unsigned int vertCount = sizeof(g_vertex_buffer_data) / sizeof(g_vertex_buffer_data[0]);
+    unsigned int indicesCount = sizeof(indices) / sizeof(indices[0]);
+
+    mesh->CreateMesh(g_vertex_buffer_data, vertCount, indices, indicesCount);
+
+    return mesh;
+}
+
 void ReloadShader(Shader* shaderToReload)
 {
 	shaderToReload->ReloadSources();
 }
 
-void RenderScene( GLuint uniformModel, glm::mat4 modelMatrix,
+void RenderScene( bool depthPass, GLuint uniformModel, glm::mat4 modelMatrix,
                     GLuint uniformSpecIntensity, GLuint uniformSpecShininess,
                     Material* shinyMat, Material* dullMat, Texture* tex1, Texture* tex2,
                     std::vector<Mesh*> meshes, Model* externalModel,
-                    float rotation)
+                    float rotation, /*TEMP*/ LightDirectional* directionalLight)
 {
     //Model
     modelMatrix = glm::mat4(1);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(-1.5f,2,-3));
+
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(-1.5f,0.0f,-3));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
     modelMatrix = glm::rotate(modelMatrix, rotation, glm::vec3(0,1,0) );
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
+    glErrorCheck("RenderScene- after Model init\n");
+
     //Mesh 1
-    shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-    tex1->UseTexture();
+    if(!depthPass)
+    {
+        shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+        glErrorCheck("RenderScene-  Mesh 1 after Use Material\n");
+        tex1->UseTexture();
+        glErrorCheck("RenderScene-  Mesh 1 after Use Texture\n");
+    }
     meshes[0]->RenderMesh();
+
+    glErrorCheck("RenderScene- after Mesh 1\n");
 
     //Mesh 2
     modelMatrix = glm::mat4(1);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(1.5f,3,-3));
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(1.5f,0.0f,-3));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.5));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
-    dullMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-    tex2->UseTexture();
+    if(!depthPass)
+    {
+        dullMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+        tex2->UseTexture();
+    }
     meshes[1]->RenderMesh();
+    glErrorCheck("RenderScene- after Mesh 2\n");
+
 
     // Floor plane
     modelMatrix = glm::mat4(1);
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
-    shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-    tex1->UseTexture();
+    if(!depthPass)
+    {
+        shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+        tex1->UseTexture();
+    }
     meshes[2]->RenderMesh();
 
     // external Model
-    modelMatrix = glm::mat4(1);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2,0.2,0.2));
-    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
-    shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
-    externalModel->RenderModel();
+    //modelMatrix = glm::mat4(1);
+    //modelMatrix = glm::translate(modelMatrix, glm::vec3(0,-0.5,0));
+    //modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2,0.2,0.2));
+    //glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelMatrix) );
 
+    //shinyMat->UseMaterial(uniformSpecIntensity, uniformSpecShininess);
+    //externalModel->RenderModel();
+
+    glErrorCheck("RenderScene- after Model 1\n");
 }
 
 void DirectionalShadowMapPass(Shader* directionalShadowShader,
@@ -213,6 +303,7 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader,
                               float rotation)
 {
 
+
     directionalShadowShader->StartUseShader();
 
     ShadowMap* shadowMap =  directionalLight->GetShadowMap();
@@ -222,34 +313,57 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader,
     shadowMap->Write(); //Start writing to it
     glClear(GL_DEPTH_BUFFER_BIT); //make sure the frame buffer is cleared before we start writing depth info to it
 
+    glErrorCheck("directional Shadowmap - after buffer clear\n");
+
+    GLint depthSize = -1;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthSize );
+    printf("depthSize: %i bits\n ", depthSize);
+    glErrorCheck("directional Shadowmap - Get Depth Size shadowmap buffer\n");
+
+    GLint depthAttachementName = -1;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &depthAttachementName );
+    printf("depthAttachementName: %i \n ", depthAttachementName);
+    glErrorCheck("directional Shadowmap - Get Depth attachement name\n");
 
     GLuint uniformModel = directionalShadowShader->GetUniformModelLocation();
-    directionalShadowShader->SetDirectionalLightTransform( directionalLight->CalculateLightTransform() );
+    m_directionalLightTransform = directionalLight->CalculateLightTransform();
+    directionalShadowShader->SetDirectionalLightTransform( &m_directionalLightTransform );
 
-    RenderScene( uniformModel, modelMatrix,
+    glErrorCheck("directional Shadowmap - Before render scene\n");
+
+    RenderScene( true, uniformModel, modelMatrix,
                  0, 0,
                 shinyMat, dullMat, tex1, tex2,
                 meshes, externalModel,
-                rotation);
+                rotation, directionalLight);
+
+    glErrorCheck("directional Shadowmap - After render scene\n");
 
     directionalShadowShader->EndUseShader();
 
+
+    GLfloat depth = 123.0f;
+    glReadPixels( 100, 100, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth );
+    printf("Depth: %.6f \n", depth);
+
+    glErrorCheck("directional Shadowmap - After Read Pixels\n");
 }
 
 void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, Camera* camera,
                     LightDirectional* directionalLight, PointLight* pointLights, uint pointLightCount, SpotLight* spotLights, uint spotLightCount,
                     Material* shinyMat, Material* dullMat, Texture* tex1, Texture* tex2,
                     std::vector<Mesh*> meshes, Model* externalModel,
-                    float rotation, GLfloat glWindowBufferWidth, GLfloat glWindowBufferHeight)
+                    float rotation, GLfloat glWindowBufferWidth, GLfloat glWindowBufferHeight
+                    )
 {
-	// Re-bind the default framebuffer 
+    // Re-bind the default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
-	//we need to make sure the viewport we're rendering in is the same size as the window
+
+    //we need to make sure the viewport we're rendering in is the same size as the window
     glViewport(0,0, glWindowBufferWidth, glWindowBufferHeight);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+    glErrorCheck("Main pass - after buffer clear\n");
 
     shader->StartUseShader();
 
@@ -270,24 +384,40 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
     shader->SetDirectionalLight(directionalLight);
     shader->SetPointLights(pointLights, pointLightCount);
     shader->SetSpotLights(spotLights, spotLightCount);
-    shader->SetDirectionalLightTransform( directionalLight->CalculateLightTransform());
+    m_directionalLightTransform = directionalLight->CalculateLightTransform();
+    shader->SetDirectionalLightTransform( &m_directionalLightTransform);
+
+    glErrorCheck("Main pass - Before Read ShadowMap\n");
 
     directionalLight->GetShadowMap()->Read(GL_TEXTURE1); //ShadowMap into Texture unit 1
     shader->SetTexture(0); // albedo texture set to texture unit 0
     shader->SetDirectionalShadowMap(1); // let the shader know that the shadowmap is in texture unit 1
 
-    RenderScene( uniformModel, modelMatrix,
+    glErrorCheck("Main pass - Before Render Scene\n");
+    RenderScene( false, uniformModel, modelMatrix,
                 shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation(),
                 shinyMat, dullMat, tex1, tex2,
                 meshes, externalModel,
-                rotation);
+                rotation, directionalLight);
+
+    glErrorCheck("Main pass - After Render Scene\n");
 
     shader->EndUseShader();
 }
 
+void RenderScreenspaceTex_ShadowMap(Shader* screenspaceTexShader, GLuint shadowMapTexID, Mesh* quadMesh)
+{
+    screenspaceTexShader->StartUseShader();
+    screenspaceTexShader->SetTexture(0);
+    glActiveTexture(GL_TEXTURE0); // Set "texture unit"
+    glBindTexture(GL_TEXTURE_2D, shadowMapTexID);
+    quadMesh->RenderMesh();
+
+    screenspaceTexShader->EndUseShader();
+}
+
 int main(void)
 {
-
 	QWindow* window = new QWindow(c_windowSizeW, c_windowSizeH, "Playground QW");
 	window->Init();
 
@@ -306,6 +436,8 @@ int main(void)
 	Mesh* floor = CreatePlane();
 	meshes.push_back(floor);
 
+    Mesh* screenspaceQuadShadowMap = CreateScreenspaceQuad();
+
 	Model* externalModel = new Model();
 	externalModel->LoadModel("../assets/Models/CobbleStones.obj");
 
@@ -313,9 +445,12 @@ int main(void)
     Shader* directionalShadowShader = new Shader();
     directionalShadowShader->LoadShader("Shaders/directionalShadowMap_Vert.glsl", "Shaders/directionalShadowMap_Frag.glsl" );
 
-	// Create and compile our GLSL program from the shaders
+    // Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
 	shader->LoadShader("Shaders/SimpleShader_Vert.glsl", "Shaders/SimpleShader_Frag.glsl");
+
+    Shader* screenspaceTexShader = new Shader();
+    screenspaceTexShader->LoadShader("Shaders/screenspaceTexture_Vert.glsl", "Shaders/screenspaceTexture_Frag.glsl");
 
 	Material* shinyMat = new Material(0.8f, 32);
 	Material* dullMat = new Material(0.3f, 4);
@@ -329,7 +464,8 @@ int main(void)
 
 	glm::vec3 ambientColor = glm::vec3(1.0f,1.0f,1.0f);
 	GLfloat ambienIntensity = 0.2f;
-	glm::vec3 lightDirection = glm::normalize(glm::vec3(0.0f, -1.0f, 0.5f) );
+    
+	glm::vec3 lightDirection = -glm::normalize(glm::vec3(0.5f,1.0f,0.0f));//glm::normalize(glm::vec3(0.0f, -1.0f, 0.5f) );
 	LightDirectional* directionalLight = new LightDirectional(ambientColor, ambienIntensity,
                                                               glm::vec3(0.8f, 0.8f, 0.8f), 1.0f,
                                                               lightDirection, 1024, 1024);
@@ -358,7 +494,8 @@ int main(void)
 
 	unsigned int spotLightCount = 2;
 
-	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.02f, 1000.0f );
+	printf( " widnow buffer width %i and height %i", window->GetWindowBufferWidth() , window->GetWindowBufferHeight() );
+	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.1f, 100.0f );
 	glm::mat4 viewMatrix = glm::mat4(1);
 	glm::mat4 modelMatrix = glm::mat4(1);
 
@@ -387,7 +524,6 @@ int main(void)
 			frameCount = 0;
 			frameTimer += 1.0;
 		}
-
 		//Get mouse pos change
 		window->PreUpdate();
 		window->Update();
@@ -406,11 +542,14 @@ int main(void)
 		{
             ReloadShader(shader);
             ReloadShader(directionalShadowShader);
+            ReloadShader(screenspaceTexShader);
 		}
 
 		rotationDegrees += 40.0f * deltaTime;
 		rotationDegrees = fmod( rotationDegrees, 360);
 		float rotation = rotationDegrees * c_degToRad;
+
+        glErrorCheck("Before directional Shadowmap pass\n");
 
         DirectionalShadowMapPass( directionalShadowShader, shader, modelMatrix, projectionMatrix, viewMatrix, camera,
                                     directionalLight, pointLights, pointLightCount, spotLights, spotLightCount,
@@ -418,12 +557,20 @@ int main(void)
                                     meshes, externalModel,
                                     rotation);
 
+        glErrorCheck("After directional Shadowmap pass\n");
+
         MainRenderPass( shader, modelMatrix, projectionMatrix, viewMatrix, camera,
                           directionalLight, pointLights, pointLightCount, spotLights, spotLightCount,
                           shinyMat, dullMat, tex1, tex2,
                           meshes, externalModel,
                           rotation, window->GetWindowBufferWidth(), window->GetWindowBufferHeight());
 
+        glErrorCheck("After main render pass\n");
+
+        GLuint shadowmapTexID = directionalLight->GetShadowMap()->GetShadowMapTexID();
+        RenderScreenspaceTex_ShadowMap(screenspaceTexShader, shadowmapTexID, screenspaceQuadShadowMap);
+
+        glErrorCheck("Screenspace Texture render pass\n");
 
         // Swap buffers
 		window->SwapBuffers();
@@ -431,7 +578,8 @@ int main(void)
 
 		window->PostUpdate();
 
-	} // Check if the ESC key was pressed or the window was closed
+        glErrorCheck("end of update loop\n");
+    } // Check if the ESC key was pressed or the window was closed
 	while( window->ShouldClose() == false );
 
 	//delete(pointLights);

@@ -1,7 +1,7 @@
 #include "PointLight.hpp"
 
 PointLight::PointLight()
-    : Light(glm::vec3(0,0,0),0, 1024, 1024)
+    : Light(glm::vec3(0,0,0),0, 0, 0)
 {
     m_position = glm::vec3(0,0,0);
     m_lightColor = glm::vec3(1,1,1);
@@ -11,7 +11,7 @@ PointLight::PointLight()
 }
 
 PointLight::PointLight(glm::vec3 position,  glm::vec3 pointColor, GLfloat constant, GLfloat linear, GLfloat exponential)
-    : Light(glm::vec3(0,0,0),0, 1024, 1024)
+    : Light(glm::vec3(0,0,0),0, 0, 0)
 {
     m_position = position;
     m_lightColor = pointColor;

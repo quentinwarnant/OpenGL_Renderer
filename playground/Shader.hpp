@@ -28,7 +28,7 @@ public:
     void SetSpotLights(SpotLight* lights, GLuint spotLightCount);
     void SetTexture(GLuint textureUnit);
     void SetDirectionalShadowMap(GLuint textureUnit);
-    void SetDirectionalLightTransform(glm::mat4 lightTransform);
+    void SetDirectionalLightTransform(glm::mat4 *lightTransform);
 
     GLuint GetUniformModelLocation();
     GLuint GetUniformViewLocation();

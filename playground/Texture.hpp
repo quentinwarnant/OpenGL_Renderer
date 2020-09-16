@@ -15,6 +15,7 @@ public:
     bool LoadTextureWithAlpha();
     void UseTexture();
     void ClearTexture();
+    GLuint GetTexID(){return m_texID;}
 
 private:
     GLuint m_texID;

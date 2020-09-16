@@ -26,6 +26,8 @@ public:
     bool IsKeyPressed(int keyId);
     void GetMouseChange(GLfloat& mousePosChangeX, GLfloat& mousePosChangeY, bool consume);
 
+    void CheckForGLError(const char* msg);
+
 private:
     GLFWwindow* m_mainWindow;
 

@@ -76,7 +76,7 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
 	float current = projCoords.z; // how far this fragment actually is
 
 	//if the current fragment's depth is larger than the closest object in the light's depth map, it's "in shadow"
-	float shadow = (current > closestToLight) ? 1.0 : 0.0f;
+	float shadow = (current > (closestToLight + 0.0001)) ? 1.0 : 0.0f;
 	return shadow;
 }
 
@@ -190,5 +190,5 @@ void main()
 	vec4 pointLightsColor = CalcPointLights();
 	vec4 spotLightsColor = CalcSpotLights();
 
-	color = texture(mainTexSampler, vUV)*  (ambientLight + directionalLightColor + pointLightsColor + spotLightsColor );
+	color = texture(mainTexSampler, vUV) * (ambientLight + directionalLightColor + pointLightsColor + spotLightsColor );
 }

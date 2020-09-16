@@ -20,6 +20,6 @@ private:
     GLfloat m_ambientIntensity;
 
 protected:
-    ShadowMap* m_shadowMap;
+    ShadowMap* m_shadowMap = nullptr;
     glm::mat4 m_lightProj;
 };

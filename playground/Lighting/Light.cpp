@@ -5,8 +5,6 @@ Light::Light()
 {
     m_ambientColor = glm::vec3(1,1,1);
     m_ambientIntensity = 1.0f;
-    m_shadowMap = new ShadowMap();
-    m_shadowMap->Init(1024, 1024);
 }
 
 
@@ -15,8 +13,11 @@ Light::Light(glm::vec3 ambientColor, GLfloat ambientIntensity, GLuint shadowMapW
     m_ambientColor = ambientColor;
     m_ambientIntensity = ambientIntensity;
 
-    m_shadowMap = new ShadowMap();
-    m_shadowMap->Init(shadowMapWidth, shadowMapHeight);
+    if( shadowMapWidth > 0 && shadowMapHeight > 0)
+    {
+        m_shadowMap = new ShadowMap();
+        m_shadowMap->Init(shadowMapWidth, shadowMapHeight);
+    }
 }
 
 
