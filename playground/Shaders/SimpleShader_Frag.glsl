@@ -77,6 +77,13 @@ float CalcDirectionalShadowFactor(DirectionalLight light)
 
 	//if the current fragment's depth is larger than the closest object in the light's depth map, it's "in shadow"
 	float shadow = (current > (closestToLight + 0.0001)) ? 1.0 : 0.0f;
+
+	if(projCoords.z > 1.0)
+	{
+		//Beyond the farplane we assume no shadow
+		shadow = 0.0;
+	}
+
 	return shadow;
 }
 

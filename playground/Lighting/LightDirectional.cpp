@@ -6,7 +6,7 @@ LightDirectional::LightDirectional() : Light()
     m_directionalColor = glm::vec3(1.0f, 0.5f, 0.5f);
     m_directionalIntensity = 1.0f;
     m_direction = glm::vec3(0.0f,-1.0f,0.0f);
-    m_lightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f,  0.1f, 100.0f);
+    m_lightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f,  0.1f, 1000.0f);
 }
 
 LightDirectional::LightDirectional(glm::vec3 ambientColor, GLfloat ambientIntensity, glm::vec3 directionalColor,
@@ -18,7 +18,7 @@ LightDirectional::LightDirectional(glm::vec3 ambientColor, GLfloat ambientIntens
     m_directionalIntensity = directionalIntensity;
 
     m_direction = direction;
-    m_lightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f,  0.1f, 100.0f);
+    m_lightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f,  0.1f, 1000.0f);
 }
 
 LightDirectional::~LightDirectional() = default;
@@ -39,7 +39,7 @@ glm::mat4 LightDirectional::CalculateLightTransform()
 {
     // Light proj * viewMatrix
     return m_lightProj * glm::lookAt(
-                glm::vec3(0.5f,1.0f,0.0f),
+                -m_direction,
                 glm::vec3(0.0f, 0.0f,0.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));
 }
