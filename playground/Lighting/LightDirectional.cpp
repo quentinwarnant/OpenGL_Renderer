@@ -39,7 +39,11 @@ glm::mat4 LightDirectional::CalculateLightTransform()
 {
     // Light proj * viewMatrix
     return m_lightProj * glm::lookAt(
-                -m_direction,
+                -m_direction * 5.0f,
                 glm::vec3(0.0f, 0.0f,0.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+void LightDirectional::SetDirection(glm::vec3 direction){
+    m_direction = direction;
 }

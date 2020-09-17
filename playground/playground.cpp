@@ -449,7 +449,7 @@ int main(void)
 	glm::vec3 ambientColor = glm::vec3(1.0f,1.0f,1.0f);
 	GLfloat ambienIntensity = 0.2f;
     
-	glm::vec3 lightDirection = glm::normalize(glm::vec3(0.5f,-1.0f,0.0f));
+	glm::vec3 lightDirection = glm::normalize(glm::vec3(0.8f,-1.0f,0.0f));
 	LightDirectional* directionalLight = new LightDirectional(ambientColor, ambienIntensity,
                                                               glm::vec3(0.8f, 0.8f, 0.8f), 1.0f,
                                                               lightDirection, 1024, 1024);
@@ -521,6 +521,9 @@ int main(void)
 		turnAxesInput.y = mousePosChangeY;
 
 		camera->Update(deltaTime, moveInput, turnAxesInput);
+
+        glm::vec3 lightDir = glm::normalize(glm::vec3(0.8f * glm::sin(currentTime),-1.0f,0.0f));
+        directionalLight->SetDirection(lightDir);
 
 		if( window->IsKeyPressed(GLFW_KEY_SPACE))
 		{

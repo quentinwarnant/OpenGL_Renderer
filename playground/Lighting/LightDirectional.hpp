@@ -18,6 +18,7 @@ public:
                             GLint directionalLightDirPropLocation);
 
     glm::mat4 CalculateLightTransform();
+    void SetDirection(glm::vec3 direction);
 
 private:
     glm::vec3 m_directionalColor;
