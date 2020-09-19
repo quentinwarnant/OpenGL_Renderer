@@ -21,14 +21,18 @@ Shader::~Shader()
     UnloadShader();
 }
 
-void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentShader)
+void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentShader, const char* pathGeometryShader )
 {
 	m_pathVertexShader = pathVertexShader;
 	m_pathFragmentShader = pathFragmentShader;
+	m_pathGeometryShader = pathGeometryShader;
+
+	bool hasGeometryShader = m_pathGeometryShader != nullptr;
 
 	// Create the shaders
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint geometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
 
 	// Read the Vertex Shader code from the file
 	std::string vertexShaderCode;
@@ -54,6 +58,22 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		fragmentShaderCode = sstr.str();
 		fragmentShaderStream.close();
 	}
+
+    // Read the Geometry Shader code from the file
+    std::string geometryShaderCode;
+	//Only if it was specified!
+	if( hasGeometryShader )
+    {
+        std::ifstream geometryShaderStream(m_pathGeometryShader, std::ios::in);
+        if(geometryShaderStream.is_open()){
+            std::stringstream sstr;
+            sstr << geometryShaderStream.rdbuf();
+            geometryShaderCode = sstr.str();
+            geometryShaderStream.close();
+        }
+    }
+
+
 
 	GLint result = GL_FALSE;
 	int infoLogLength;
@@ -93,11 +113,36 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		throw new ShaderException("Compilation of fragment shader failed");
 	}
 
-	// Link the program
+    //optional geometry shader
+    if( hasGeometryShader)
+    {
+        printf("Compiling shader : %s\n", m_pathGeometryShader);
+        char const * geometrySourcePointer = geometryShaderCode.c_str();
+        glShaderSource(geometryShaderID, 1, &geometrySourcePointer , NULL);
+        glCompileShader(geometryShaderID);
+
+        // Check Fragment Shader Compilation
+        glGetShaderiv(geometryShaderID, GL_COMPILE_STATUS, &result);
+        if ( !result ){
+            glGetShaderiv(geometryShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+            std::vector<char> geometryShaderErrorMessage(infoLogLength+1);
+            glGetShaderInfoLog(geometryShaderID, infoLogLength, NULL, &geometryShaderErrorMessage[0]);
+            printf("%s\n", &geometryShaderErrorMessage[0]);
+
+            throw new ShaderException("Compilation of geometry shader failed");
+        }
+    }
+
+
+    // Link the program
 	printf("Linking shader program\n");
 	GLuint programID = glCreateProgram();
 	glAttachShader(programID, vertexShaderID);
 	glAttachShader(programID, fragmentShaderID);
+	if( hasGeometryShader )
+    {
+        glAttachShader(programID, geometryShaderID);
+    }
 	glLinkProgram(programID);
 
 	// Check the program Linking result
@@ -111,28 +156,18 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 		throw new ShaderException("Linking of shader program failed");
 	}
 
-
-	// Error "no VAO bound" - should this only get checked when using it?
-	// glValidateProgram(programID);
-	// glGetProgramiv(programID, GL_VALIDATE_STATUS, &result);
-	// if ( !result ){
-	// 	glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
-	// 	std::vector<char> programErrorMessage(infoLogLength+1);
-	// 	glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
-	// 	printf("%s\n", &programErrorMessage[0]);
-
-	// 	throw new ShaderException("Validation of shader program failed");
-	// }
-
-	
 	glDetachShader(programID, vertexShaderID);
 	glDetachShader(programID, fragmentShaderID);
-	
+
 	glDeleteShader(vertexShaderID);
 	glDeleteShader(fragmentShaderID);
+    if(hasGeometryShader)
+    {
+        glDetachShader(programID, geometryShaderID);
+        glDeleteShader(geometryShaderID);
+    }
 
 	m_shaderProgramLocation = programID;
-
 
     //Find uniforms
     m_uniformModelLocation 		= glGetUniformLocation(programID, "Model");
@@ -170,7 +205,6 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 
 		snprintf(buff, sizeof(buff), "pointLights[%zu].exponential", i);
 		m_uniformPointLightLocations[i].exponential = glGetUniformLocation(programID,buff);
-
 	}
 
 	//Spot Lights (spot lights contains a point light info / derives from it)
@@ -207,6 +241,18 @@ void Shader::LoadShader(const char* pathVertexShader, const char* pathFragmentSh
 
 	m_uniformSpecularIntensityLocation = glGetUniformLocation(programID, "material.specularIntensity");
 	m_uniformSpecularShininessLocation = glGetUniformLocation(programID, "material.shininess");
+
+	//omniLight shadowmap
+    m_uniformOmniLightPos = glGetUniformLocation(programID, "lightPos");
+    m_uniformFarPlane = glGetUniformLocation(programID, "farPlane");
+    for (size_t i = 0; i < 6; ++i)
+    {
+        //make up the location string
+        char buff[100] = {'\0'};
+
+        snprintf(buff, sizeof(buff), "lightMatrices [%zu]", i);
+        m_uniformLightMatrices[i] = glGetUniformLocation(programID,buff);
+    }
 }
 
 void Shader::ReloadSources()
@@ -340,5 +386,23 @@ void Shader::SetDirectionalShadowMap(GLuint textureUnit)
 void Shader::SetDirectionalLightTransform(glm::mat4 *lightTransform)
 {
     glUniformMatrix4fv(m_uniformDirectionalLightTransform,1, GL_FALSE, glm::value_ptr(*lightTransform));
+}
+
+GLuint Shader::GetUniformOmniLightPosLocation() const
+{
+    return m_uniformOmniLightPos;
+}
+
+GLuint Shader::GetUniformFarPlaneLocation() const
+{
+    return m_uniformFarPlane;
+}
+
+void Shader::SetLightMatrices(std::vector<glm::mat4> lightMatrices)
+{
+    for (size_t i = 0; i < 6; ++i)
+    {
+        glUniformMatrix4fv(m_uniformLightMatrices[i],1,GL_FALSE,glm::value_ptr(lightMatrices[i]) );
+    }
 }
 

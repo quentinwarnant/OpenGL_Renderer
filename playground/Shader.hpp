@@ -16,7 +16,7 @@ public:
     Shader();
     ~Shader();
 
-    void LoadShader(const char* pathVertexShader, const char* pathFragmentShader);
+    void LoadShader(const char* pathVertexShader, const char* pathFragmentShader, const char* pathGeometryShader = nullptr);
 
     void StartUseShader();
     void EndUseShader();
@@ -44,10 +44,16 @@ public:
     
     GLuint GetUniformSpecularIntensityLocation();
     GLuint GetUniformSpecularShininessLocation();
-    
+
+    //Omnidirectional shadowmap
+    GLuint GetUniformFarPlaneLocation() const;
+    GLuint GetUniformOmniLightPosLocation() const;
+    void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
+
 private:
     const char* m_pathVertexShader;
     const char* m_pathFragmentShader;
+    const char* m_pathGeometryShader;
 
     GLuint m_shaderProgramLocation;
 
@@ -105,7 +111,11 @@ private:
     //Material
     GLuint m_uniformSpecularIntensityLocation;
     GLuint m_uniformSpecularShininessLocation;
-    
+
+    //Omnidirectional shadowmap
+    GLuint m_uniformOmniLightPos, m_uniformFarPlane;
+
+    GLuint m_uniformLightMatrices[6];
 
 
     void UnloadShader();

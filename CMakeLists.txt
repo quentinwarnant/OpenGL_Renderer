@@ -93,7 +93,7 @@ add_executable(playground
 	playground/Shaders/SimpleShader_Vert.glsl
 	playground/Shaders/directionalShadowMap_Frag.glsl
 	playground/Shaders/directionalShadowMap_Vert.glsl
-)
+        playground/Lighting/OmniShadowMap.cpp playground/Lighting/OmniShadowMap.hpp)
 target_link_libraries(playground
 	${ALL_LIBS}
 	assimp

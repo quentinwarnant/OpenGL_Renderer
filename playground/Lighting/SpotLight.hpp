@@ -6,7 +6,9 @@ class SpotLight : public PointLight
 {
 public:
     SpotLight();
-    SpotLight(glm::vec3 position, glm::vec3 spotDirection, glm::vec3 spotColor, GLfloat constant, GLfloat linear, GLfloat exponential, GLfloat angle);
+    SpotLight(glm::vec3 position, glm::vec3 spotDirection, glm::vec3 spotColor,
+              GLfloat constant, GLfloat linear, GLfloat exponential, GLfloat angle,
+              GLuint shadowMapWidth, GLuint shadowMapHeight, GLfloat nearPlane, GLfloat farPlane);
     
     ~SpotLight();
 

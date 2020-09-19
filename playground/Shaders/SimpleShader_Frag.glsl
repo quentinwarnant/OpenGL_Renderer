@@ -221,5 +221,4 @@ void main()
 	vec4 spotLightsColor = CalcSpotLights(normal);
 
 	color = texture(mainTexSampler, vUV) * (ambientLight + directionalLightColor + pointLightsColor + spotLightsColor );
-	color = directionalLightColor;
 }

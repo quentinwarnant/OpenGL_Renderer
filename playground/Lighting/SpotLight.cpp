@@ -7,8 +7,11 @@ SpotLight::SpotLight() : PointLight()
     m_processedAngle = cosf(glm::radians(m_angle));
  }
 
-SpotLight::SpotLight(glm::vec3 position, glm::vec3 spotDirection, glm::vec3 spotColor , GLfloat constant, GLfloat linear, GLfloat exponential, GLfloat angle)
-    :PointLight(position, spotColor, constant, linear, exponential)
+SpotLight::SpotLight(glm::vec3 position, glm::vec3 spotDirection, glm::vec3 spotColor,
+                     GLfloat constant, GLfloat linear, GLfloat exponential, GLfloat angle,
+                     GLuint shadowMapWidth, GLuint shadowMapHeight, GLfloat nearPlane, GLfloat farPlane)
+    :PointLight(position, spotColor, constant, linear, exponential,
+                shadowMapWidth, shadowMapHeight, nearPlane, farPlane)
 {
     m_direction = spotDirection;
     m_angle = angle;

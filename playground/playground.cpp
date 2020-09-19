@@ -225,7 +225,7 @@ void RenderScene( GLuint uniformModel, glm::mat4 modelMatrix,
                     GLuint uniformSpecIntensity, GLuint uniformSpecShininess,
                     Material* shinyMat, Material* dullMat, Texture* tex1, Texture* tex2,
                     std::vector<Mesh*> meshes, Model* externalModel,
-                    float rotation, /*TEMP*/ LightDirectional* directionalLight)
+                    float rotation)
 {
     //Model
     modelMatrix = glm::mat4(1);
@@ -279,9 +279,8 @@ void RenderScene( GLuint uniformModel, glm::mat4 modelMatrix,
     glErrorCheck("RenderScene- after Model 1\n");
 }
 
-void DirectionalShadowMapPass(Shader* directionalShadowShader,
-                              Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, Camera* camera,
-                              LightDirectional* directionalLight, PointLight* pointLights, uint pointLightCount, SpotLight* spotLights, uint spotLightCount,
+void DirectionalShadowMapPass(Shader* directionalShadowShader, glm::mat4 modelMatrix,
+                              LightDirectional* directionalLight,
                               Material* shinyMat, Material* dullMat, Texture* tex1, Texture* tex2,
                               std::vector<Mesh*> meshes, Model* externalModel,
                               float rotation)
@@ -319,7 +318,7 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader,
                  0, 0,
                 shinyMat, dullMat, tex1, tex2,
                 meshes, externalModel,
-                rotation, directionalLight);
+                rotation);
 
     glErrorCheck("directional Shadowmap - After render scene\n");
 
@@ -332,6 +331,58 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader,
 
     glErrorCheck("directional Shadowmap - After Read Pixels\n");
 }
+
+
+void OmniDirectionalShadowMapPass(Shader* omniDirectionShadowMapShader, glm::mat4 modelMatrix,
+                       PointLight* light,
+                       Material* shinyMat, Material* dullMat, Texture* tex1, Texture* tex2,
+                       std::vector<Mesh*> meshes, Model* externalModel,
+                       float rotation)
+{
+    omniDirectionShadowMapShader->StartUseShader();
+
+    ShadowMap* shadowMap =  light->GetShadowMap();
+    //we need to make sure the viewport we're rendering in is the same size as the shadowmap
+    glViewport(0,0,shadowMap->GetShadowWidth(), shadowMap->GetShadowHeight());
+
+    shadowMap->Write(); //Start writing to it
+    glClear(GL_DEPTH_BUFFER_BIT); //make sure the frame buffer is cleared before we start writing depth info to it
+
+    glErrorCheck("omniDirectional Shadowmap - after buffer clear\n");
+/*
+    GLint depthSize = -1;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthSize );
+    printf("depthSize: %i bits\n ", depthSize);
+    glErrorCheck("omniDirectional Shadowmap - Get Depth Size shadowmap buffer\n");
+
+    GLint depthAttachementName = -1;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &depthAttachementName );
+    printf("depthAttachementName: %i \n ", depthAttachementName);
+    glErrorCheck("omniDirectional Shadowmap - Get Depth attachement name\n");
+*/
+    GLuint uniformModel = omniDirectionShadowMapShader->GetUniformModelLocation();
+    GLuint uniformOmniLightPos = omniDirectionShadowMapShader->GetUniformOmniLightPosLocation();
+    GLuint uniformFarPlane = omniDirectionShadowMapShader->GetUniformFarPlaneLocation();
+
+    glUniform3f(uniformOmniLightPos, light->GetPos().x, light->GetPos().y, light->GetPos().z);
+    glUniform1f(uniformFarPlane, light->GetFarPlane());
+
+    std::vector<glm::mat4> lightMatrices = light->CalculateLightTransforms();
+    omniDirectionShadowMapShader->SetLightMatrices( lightMatrices );
+
+    glErrorCheck("omniDirectional Shadowmap - Before render scene\n");
+
+    RenderScene( uniformModel, modelMatrix,
+                 0, 0,
+                 shinyMat, dullMat, tex1, tex2,
+                 meshes, externalModel,
+                 rotation);
+
+    glErrorCheck("omniDirectional Shadowmap - After render scene\n");
+
+    omniDirectionShadowMapShader->EndUseShader();
+}
+
 
 void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, Camera* camera,
                     LightDirectional* directionalLight, PointLight* pointLights, uint pointLightCount, SpotLight* spotLights, uint spotLightCount,
@@ -373,6 +424,7 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
 
     glErrorCheck("Main pass - Before Read ShadowMap\n");
 
+    //TODO add omni light shadowmap read
     directionalLight->GetShadowMap()->Read(GL_TEXTURE1); //ShadowMap into Texture unit 1
     shader->SetTexture(0); // albedo texture set to texture unit 0
     shader->SetDirectionalShadowMap(1); // let the shader know that the shadowmap is in texture unit 1
@@ -382,7 +434,7 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
                 shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation(),
                 shinyMat, dullMat, tex1, tex2,
                 meshes, externalModel,
-                rotation, directionalLight);
+                rotation);
 
     glErrorCheck("Main pass - After Render Scene\n");
 
@@ -429,6 +481,11 @@ int main(void)
     Shader* directionalShadowShader = new Shader();
     directionalShadowShader->LoadShader("Shaders/directionalShadowMap_Vert.glsl", "Shaders/directionalShadowMap_Frag.glsl" );
 
+    //OmniDirectional Shadowmap shader
+    Shader* omniDirectionalShadowShader = new Shader();
+    omniDirectionalShadowShader->LoadShader("Shaders/omniDirectionalShadowMap_Vert.glsl", "Shaders/omniDirectionalShadowMap_Frag.glsl", "Shaders/omniDirectionalShadowMap_Geo.glsl" );
+
+
     // Create and compile our GLSL program from the shaders
 	Shader* shader = new Shader();
 	shader->LoadShader("Shaders/SimpleShader_Vert.glsl", "Shaders/SimpleShader_Frag.glsl");
@@ -457,9 +514,11 @@ int main(void)
 	// Array of PointLights
 	PointLight pointLights[] = {
 		PointLight(glm::vec3(1.0f, 0.5f, -3.0f),
-										glm::vec3(0,0,1), 0.3f,0.2f, 0.1f ),
+										glm::vec3(0,0,1), 0.3f,0.2f, 0.1f,
+										1024, 1024, 0.01f, 100.0f),
 		PointLight(glm::vec3(3.5f, 0.2f, -2.5f),
-										glm::vec3(0,1,0), 0.3f,0.2f, 0.1f )
+										glm::vec3(0,1,0), 0.3f,0.2f, 0.1f,
+                   1024, 1024, 0.01f, 100.0f)
 										};
 	unsigned int pointLightCount = 2;
 
@@ -468,18 +527,20 @@ int main(void)
 		SpotLight(glm::vec3(1.0f, .7f, -3.0f),
 								glm::normalize( glm::vec3(0,-1,0) ),
 								glm::vec3(1,0,1), 0.3f,0.2f, 0.1f,
-								25.0f ),
+								25.0f,
+                  1024, 1024, 0.01f, 100.0f),
 
 		SpotLight(glm::vec3(-3.5f, 0.2f, -2.5f),
 								glm::normalize( glm::vec3(0,-0.5,-1.0f ) ),
 								glm::vec3(1,0,0), 0.3f,0.2f, 0.1f,
-								40.0f )
+								40.0f,
+                  1024, 1024, 0.01f, 100.0f)
 	};
 
 	unsigned int spotLightCount = 2;
 
 	printf( " widnow buffer width %i and height %i", window->GetWindowBufferWidth() , window->GetWindowBufferHeight() );
-	glm::mat4 projectionMatrix = glm::perspective(45.0f, (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.1f, 100.0f );
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians( 60.0f ), (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.1f, 100.0f );
 	glm::mat4 viewMatrix = glm::mat4(1);
 	glm::mat4 modelMatrix = glm::mat4(1);
 
@@ -538,13 +599,30 @@ int main(void)
 
         glErrorCheck("Before directional Shadowmap pass\n");
 
-        DirectionalShadowMapPass( directionalShadowShader, shader, modelMatrix, projectionMatrix, viewMatrix, camera,
-                                    directionalLight, pointLights, pointLightCount, spotLights, spotLightCount,
+        DirectionalShadowMapPass( directionalShadowShader, modelMatrix, directionalLight,
                                     shinyMat, dullMat, tex1, tex2,
                                     meshes, externalModel,
                                     rotation);
 
         glErrorCheck("After directional Shadowmap pass\n");
+
+        for (size_t i = 0; i < pointLightCount; ++i)
+        {
+            OmniDirectionalShadowMapPass( omniDirectionalShadowShader, modelMatrix, &pointLights[i],
+                                          shinyMat, dullMat, tex1, tex2,
+                                          meshes, externalModel,
+                                          rotation);
+        }
+        for (size_t i = 0; i < spotLightCount; ++i)
+        {
+            OmniDirectionalShadowMapPass( omniDirectionalShadowShader, modelMatrix, &spotLights[i],
+                                          shinyMat, dullMat, tex1, tex2,
+                                          meshes, externalModel,
+                                          rotation);
+        }
+
+
+        glErrorCheck("After omnidirectional Shadowmap pass\n");
 
         MainRenderPass( shader, modelMatrix, projectionMatrix, viewMatrix, camera,
                           directionalLight, pointLights, pointLightCount, spotLights, spotLightCount,
@@ -580,6 +658,8 @@ int main(void)
 
 	// Cleanup shader
 	delete(shader);
+	delete(directionalShadowShader);
+	delete(omniDirectionalShadowShader);
 
 	// Cleanup meshes
 	for (size_t i = 0; i < meshes.size(); i++)
