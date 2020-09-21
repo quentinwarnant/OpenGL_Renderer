@@ -78,7 +78,7 @@ bool Texture::LoadTextureWithAlpha()
 
 void Texture::UseTexture()
 {
-    glActiveTexture(GL_TEXTURE0); // Set "texture unit"
+    glActiveTexture(GL_TEXTURE1); // Set "texture unit"
     glBindTexture(GL_TEXTURE_2D, m_texID);
 }
 

@@ -313,6 +313,7 @@ void DirectionalShadowMapPass(Shader* directionalShadowShader, glm::mat4 modelMa
     directionalShadowShader->SetDirectionalLightTransform( &directionalLightTransform );
 
     glErrorCheck("directional Shadowmap - Before render scene\n");
+    //directionalShadowShader->Validate();
 
     RenderScene( uniformModel, modelMatrix,
                  0, 0,
@@ -371,6 +372,7 @@ void OmniDirectionalShadowMapPass(Shader* omniDirectionShadowMapShader, glm::mat
     omniDirectionShadowMapShader->SetLightMatrices( lightMatrices );
 
     glErrorCheck("omniDirectional Shadowmap - Before render scene\n");
+    //omniDirectionShadowMapShader->Validate();
 
     RenderScene( uniformModel, modelMatrix,
                  0, 0,
@@ -417,19 +419,19 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
 
     //Setup Lights
     shader->SetDirectionalLight(directionalLight);
-    shader->SetPointLights(pointLights, pointLightCount);
-    shader->SetSpotLights(spotLights, spotLightCount);
+    shader->SetPointLights(pointLights, pointLightCount, 3,0);
+    shader->SetSpotLights(spotLights, spotLightCount, 3  + pointLightCount, pointLightCount);
     glm::mat4 directionalLightTransform = directionalLight->CalculateLightTransform();
     shader->SetDirectionalLightTransform( &directionalLightTransform);
 
     glErrorCheck("Main pass - Before Read ShadowMap\n");
 
-    //TODO add omni light shadowmap read
-    directionalLight->GetShadowMap()->Read(GL_TEXTURE1); //ShadowMap into Texture unit 1
-    shader->SetTexture(0); // albedo texture set to texture unit 0
-    shader->SetDirectionalShadowMap(1); // let the shader know that the shadowmap is in texture unit 1
+    directionalLight->GetShadowMap()->Read(GL_TEXTURE2); //ShadowMap into Texture unit 2
+    shader->SetTexture(1); // albedo texture set to texture unit 1 - starting at 1 so we avoid errors with uninitialised samplers type conflicts at texture unit 0
+    shader->SetDirectionalShadowMap(2); // let the shader know that the shadowmap is in texture unit 2
 
     glErrorCheck("Main pass - Before Render Scene\n");
+    //shader->Validate();
     RenderScene( uniformModel, modelMatrix,
                 shader->GetUniformSpecularIntensityLocation(), shader->GetUniformSpecularShininessLocation(),
                 shinyMat, dullMat, tex1, tex2,
@@ -444,9 +446,11 @@ void MainRenderPass(Shader* shader, glm::mat4 modelMatrix, glm::mat4 projectionM
 void RenderScreenspaceTex_ShadowMap(Shader* screenspaceTexShader, GLuint shadowMapTexID, Mesh* quadMesh)
 {
     screenspaceTexShader->StartUseShader();
-    screenspaceTexShader->SetTexture(0);
-    glActiveTexture(GL_TEXTURE0); // Set "texture unit"
-    glBindTexture(GL_TEXTURE_2D, shadowMapTexID);
+    screenspaceTexShader->SetTexture(1);
+    glActiveTexture(GL_TEXTURE1); // Set "texture unit"
+    //glBindTexture(GL_TEXTURE_2D, shadowMapTexID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, shadowMapTexID);
+
     quadMesh->RenderMesh();
 
     screenspaceTexShader->EndUseShader();
@@ -510,34 +514,38 @@ int main(void)
 	LightDirectional* directionalLight = new LightDirectional(ambientColor, ambienIntensity,
                                                               glm::vec3(0.8f, 0.8f, 0.8f), 1.0f,
                                                               lightDirection, 1024, 1024);
-
 	// Array of PointLights
 	PointLight pointLights[] = {
 		PointLight(glm::vec3(1.0f, 0.5f, -3.0f),
 										glm::vec3(0,0,1), 0.3f,0.2f, 0.1f,
 										1024, 1024, 0.01f, 100.0f),
-		PointLight(glm::vec3(3.5f, 0.2f, -2.5f),
+    };
+	/*
+    	PointLight(glm::vec3(3.5f, 0.2f, -2.5f),
 										glm::vec3(0,1,0), 0.3f,0.2f, 0.1f,
                    1024, 1024, 0.01f, 100.0f)
 										};
-	unsigned int pointLightCount = 2;
+    */
+	unsigned int pointLightCount = 1;
 
 	//Array of SpotLights
-	SpotLight spotLights[] = {
+	SpotLight spotLights[] = {};
+    /*
 		SpotLight(glm::vec3(1.0f, .7f, -3.0f),
 								glm::normalize( glm::vec3(0,-1,0) ),
 								glm::vec3(1,0,1), 0.3f,0.2f, 0.1f,
 								25.0f,
                   1024, 1024, 0.01f, 100.0f),
 
-		SpotLight(glm::vec3(-3.5f, 0.2f, -2.5f),
+		SpotLight(glm::vec3(-2.0f, 0.5f, -2.2f),
 								glm::normalize( glm::vec3(0,-0.5,-1.0f ) ),
 								glm::vec3(1,0,0), 0.3f,0.2f, 0.1f,
 								40.0f,
                   1024, 1024, 0.01f, 100.0f)
 	};
+    */
 
-	unsigned int spotLightCount = 2;
+	unsigned int spotLightCount = 0;
 
 	printf( " widnow buffer width %i and height %i", window->GetWindowBufferWidth() , window->GetWindowBufferHeight() );
 	glm::mat4 projectionMatrix = glm::perspective(glm::radians( 60.0f ), (GLfloat) window->GetWindowBufferWidth() / (GLfloat) window->GetWindowBufferHeight(), 0.1f, 100.0f );
@@ -583,8 +591,10 @@ int main(void)
 
 		camera->Update(deltaTime, moveInput, turnAxesInput);
 
-        glm::vec3 lightDir = glm::normalize(glm::vec3(0.8f * glm::sin(currentTime),-1.0f,0.0f));
-        directionalLight->SetDirection(lightDir);
+        //Swing directional light
+        //glm::vec3 lightDir = glm::normalize(glm::vec3(0.8f * glm::sin(currentTime),-1.0f,0.0f));
+        //directionalLight->SetDirection(lightDir);
+        pointLights[0].SetPos(camera->GetPos());
 
 		if( window->IsKeyPressed(GLFW_KEY_SPACE))
 		{
@@ -632,7 +642,7 @@ int main(void)
 
         glErrorCheck("After main render pass\n");
 
-        GLuint shadowmapTexID = directionalLight->GetShadowMap()->GetShadowMapTexID();
+        GLuint shadowmapTexID = pointLights[0].GetShadowMap()->GetShadowMapTexID();
         RenderScreenspaceTex_ShadowMap(screenspaceTexShader, shadowmapTexID, screenspaceQuadShadowMap);
 
         glErrorCheck("Screenspace Texture render pass\n");

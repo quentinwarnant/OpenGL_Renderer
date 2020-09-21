@@ -11,6 +11,6 @@ uniform sampler2D mainTexSampler;
 void main()
 {
     color = texture(mainTexSampler, vUV);
-    float d = color.r * 300;//> 0.02 ? 1 : 0;
+    float d = color.r * 1;//> 0.02 ? 1 : 0;
     color.rgb = vec3(d,d,d);
 }

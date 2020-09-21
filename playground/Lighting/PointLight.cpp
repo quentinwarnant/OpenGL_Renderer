@@ -51,27 +51,58 @@ void PointLight::UseLight(GLuint pointPositionPropLocation, GLuint pointColorPro
 std::vector<glm::mat4> PointLight::CalculateLightTransforms()
 {
     std::vector<glm::mat4> lightMatrices;
+    /*
     glm::vec3 directions[] = {
-            glm::vec3(1,0,0),
-            glm::vec3(-1,0,0),
-            glm::vec3(0,1,0),
-            glm::vec3(0,-1,0),
-            glm::vec3(0,0,1),
-            glm::vec3(0,0,-1),
+            glm::vec3(1.0,0.0,0.0),
+            glm::vec3(-1.0,0.0,0.0),
+            glm::vec3(0.0,1.0,0.0),
+            glm::vec3(0.0,-1.0,0.0),
+            glm::vec3(0.0,0.0,1.0),
+            glm::vec3(0.0,0.0,-1.0),
     };
     glm::vec3 up[] = {
-            glm::vec3(0,1,0), //Negative Y?
-            glm::vec3(0,1,0),
-            glm::vec3(0,0,1),
-            glm::vec3(0,0,1),
-            glm::vec3(0,1,0),
-            glm::vec3(0,1,0),
+            glm::vec3(0.0,-1.0,0.0), //Negative Y?
+            glm::vec3(0.0,-1.0,0.0),
+            glm::vec3(0.0,0.0,1.0),
+            glm::vec3(0.0,0.0,-1.0),
+            glm::vec3(0.0,-1.0,0.0),
+            glm::vec3(0.0,-1.0,0.0),
     };
 
     for (int i = 0; i < 6; ++i)
     {
-        lightMatrices.push_back(m_lightProj * glm::lookAt( m_position, m_position+directions[i],up[i] ));
+        lightMatrices.push_back(m_lightProj * glm::lookAt( m_position, m_position+directions[i], up[i] ));
     }
 
+*/
+
+
+
+
+lightMatrices.push_back(m_lightProj * 
+                 glm::lookAt(m_position, m_position + glm::vec3( 1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
+lightMatrices.push_back(m_lightProj * 
+                 glm::lookAt(m_position, m_position + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
+lightMatrices.push_back(m_lightProj * 
+                 glm::lookAt(m_position, m_position + glm::vec3( 0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+lightMatrices.push_back(m_lightProj * 
+                 glm::lookAt(m_position, m_position + glm::vec3( 0.0,-1.0, 0.0), glm::vec3(0.0, 0.0,-1.0)));
+lightMatrices.push_back(m_lightProj * 
+                 glm::lookAt(m_position, m_position + glm::vec3( 0.0, 0.0, 1.0), glm::vec3(0.0,-1.0, 0.0)));
+lightMatrices.push_back(m_lightProj * 
+                 glm::lookAt(m_position, m_position + glm::vec3( 0.0, 0.0,-1.0), glm::vec3(0.0,-1.0, 0.0)));
+
+
+   
+
+
+
+
+
     return lightMatrices;
+}
+
+void PointLight::SetPos(glm::vec3 pos)
+{
+    m_position = pos;
 }

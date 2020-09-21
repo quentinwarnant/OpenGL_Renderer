@@ -17,6 +17,7 @@ public:
 
     std::vector<glm::mat4> CalculateLightTransforms();
     glm::vec3 GetPos(){return m_position;}
+    void SetPos(glm::vec3 pos);
     GLfloat GetFarPlane(){ return m_farPlane;}
 
 

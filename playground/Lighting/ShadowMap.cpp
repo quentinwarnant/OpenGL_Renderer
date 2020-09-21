@@ -68,6 +68,8 @@ bool ShadowMap::Init(GLuint shadowMapWidth, GLuint shadowMapHeight)
         return false;
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     return true;
 }
 

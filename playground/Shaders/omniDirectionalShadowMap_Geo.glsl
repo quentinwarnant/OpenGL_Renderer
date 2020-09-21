@@ -9,10 +9,10 @@ out vec4 FragPos;
 
 void main()
 {
-    for(int face = 0; face < 6; face++)
+    for(int face = 0; face < 6; ++face)
     {
         gl_Layer = face; // Define which of the 6 cubemap texture to emit into
-        for(int i = 0; i < 3; i++) // each vertex in triangle
+        for(int i = 0; i < 3; ++i) // each vertex in triangle
         {
             FragPos = gl_in[i].gl_Position;
             gl_Position = lightMatrices[face] * FragPos;

@@ -17,6 +17,7 @@ public:
     ~Shader();
 
     void LoadShader(const char* pathVertexShader, const char* pathFragmentShader, const char* pathGeometryShader = nullptr);
+    void Validate(); 
 
     void StartUseShader();
     void EndUseShader();
@@ -24,8 +25,8 @@ public:
     void ReloadSources();
 
     void SetDirectionalLight(LightDirectional* light);
-    void SetPointLights(PointLight* lights, GLuint pointLightCount);
-    void SetSpotLights(SpotLight* lights, GLuint spotLightCount);
+    void SetPointLights(PointLight* lights, GLuint pointLightCount, GLuint initialTextureUnit, GLuint offset);
+    void SetSpotLights(SpotLight* lights, GLuint spotLightCount, GLuint initialTextureUnit, GLuint offset);
     void SetTexture(GLuint textureUnit);
     void SetDirectionalShadowMap(GLuint textureUnit);
     void SetDirectionalLightTransform(glm::mat4 *lightTransform);
@@ -51,6 +52,7 @@ public:
     void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
 
 private:
+
     const char* m_pathVertexShader;
     const char* m_pathFragmentShader;
     const char* m_pathGeometryShader;
@@ -62,12 +64,12 @@ private:
     GLuint m_uniformViewLocation;
     GLuint m_uniformProjectionLocation;
 
-    //?
     GLuint m_uniformCameraWorldPosLocation;
 
     //Lighting
 
-    struct {
+    struct 
+    {
       GLuint ambientColor;
       GLuint ambientIntensity;
       GLuint directionalColor;
@@ -80,7 +82,8 @@ private:
     GLuint m_pointLightCount;
     GLuint m_uniformPointLightCount;
 
-    struct {
+    struct
+    {
       GLuint color;
       GLuint position;
       GLuint constant;
@@ -93,7 +96,8 @@ private:
     GLuint m_spotLightCount;
     GLuint m_uniformSpotLightCount;
 
-    struct {
+    struct 
+    {
       GLuint color;
       GLuint position;
       GLuint direction;
@@ -116,6 +120,11 @@ private:
     GLuint m_uniformOmniLightPos, m_uniformFarPlane;
 
     GLuint m_uniformLightMatrices[6];
+    struct
+    {
+      GLuint shadowMap;
+      GLuint farPlane;
+    } m_uniformOmniShadowMap[MAX_POINT_AND_SPOT_LIGHTS];
 
 
     void UnloadShader();
